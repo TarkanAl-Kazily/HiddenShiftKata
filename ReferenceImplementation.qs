@@ -29,6 +29,7 @@ namespace HiddenShiftKata
         adjoint auto;
     }
 
+    // Given an integer s, prepare the given qubit register with the integer in little endian order.
     operation PrepareQubitFromInt(qs : Qubit[], s : Int) : Unit {
         body (...) {
             let N = Length(qs);
@@ -61,7 +62,7 @@ namespace HiddenShiftKata
         controlled auto;
     }
 
-    // Returns the shifted oracle g(x) = f(x + s).
+    // Returns the shifted oracle g for a marking oralce f such that g(x) = f(x + s).
     function ShiftedOracle(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int) : ((Qubit[], Qubit) => Unit : Controlled) {
         return ShiftedOracleHelper(f, s, _, _);
     }
@@ -80,11 +81,13 @@ namespace HiddenShiftKata
         controlled auto;
     }
 
+    // Returns the phase flip oracle corresponding to the marking oracle f.
     function PhaseFlipOracle(f : ((Qubit[], Qubit) => Unit : Controlled)) : ((Qubit[]) => Unit : Controlled) {
         return PhaseFlipOracleHelper(f, _);
     }
 
     //--------------------------------------------------------------------
+    // Determines the hidden shift s from the oracle for g(x) and the daul of f(x).
     operation AlgorithmOne(N : Int, oracledualf : ((Qubit[]) => Unit), oracleg : ((Qubit[]) => Unit)) : Int {
         mutable res = 0;
         using (qs = Qubit[N]) {
