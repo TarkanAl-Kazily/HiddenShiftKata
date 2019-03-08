@@ -11,9 +11,11 @@ namespace HiddenShiftKata
 
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Primitive;
+    open Microsoft.Quantum.Extensions.Diagnostics;
 
     // Implement the inner product oracle, which is the most basic kind
     // of bent function.
+    // The dual of the inner product function is itself.
     operation InnerProductOracle(x : Qubit[], target : Qubit) : Unit {
         body (...) {
             let N = Length(x);
@@ -46,9 +48,13 @@ namespace HiddenShiftKata
             let N = Length(x);
             using (qs = Qubit[N]) {
                 PrepareQubitFromInt(qs, s);
-                ModularAddProductLE(1, 2^N, LittleEndian(x), LittleEndian(qs));
+                for (i in 0 .. N - 1) {
+                    CNOT(x[i], qs[i]);
+                }
                 f(qs, target);
-                Adjoint ModularAddProductLE(1, 2^N, LittleEndian(x), LittleEndian(qs));
+                for (i in 0 .. N - 1) {
+                    CNOT(x[i], qs[i]);
+                }
                 Adjoint PrepareQubitFromInt(qs, s);
             }
         }
