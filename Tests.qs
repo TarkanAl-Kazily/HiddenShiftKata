@@ -62,4 +62,42 @@
         }
     }
 
+    function QuadraticClassical(arr : Int[], Q : Int[][], L : Int[]) : Int {
+        let N = Length(arr);
+        mutable res = 0;
+        for (j in 0 .. N - 1) {
+            set res = res + L[j]*arr[j];
+            for (i in 0 .. j - 1) {
+                set res = res + Q[i][j] * arr[i] * arr[j];
+            }
+            set res = res % 2;
+        }
+        return res;
+    }
+
+    operation QuadraticOracleTestCase (arr : Int[], Q : Int[][], L : Int[]) : Unit {
+        let expected = QuadraticClassical(arr, Q, L);
+        let N = Length(arr);
+        using ((qs, target) = (Qubit[N], Qubit())) {
+            PrepareQubitRegister(qs, arr);
+            QuadraticOracle(qs, target, Q, L);
+            if (expected == 1) {
+                X(target);
+            }
+            Adjoint PrepareQubitRegister(qs, arr);
+            AssertAllZero(qs);
+            AssertAllZero([target]);
+        }
+    }
+
+    operation QuadraticOracleTest () : Unit {
+        mutable Q = new Int[][4];
+        set Q[0] = [0, 1, 1, 1];
+        set Q[1] = [0, 0, 1, 1];
+        set Q[2] = [0, 0, 0, 1];
+        set Q[3] = [0, 0, 0, 0];
+        let L = [1, 0, 0, 0];
+        IterateThroughCartesianPower(Length(L), 2, QuadraticOracleTestCase(_, Q, L));
+    }
+
 }

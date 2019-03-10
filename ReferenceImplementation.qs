@@ -29,6 +29,31 @@ namespace HiddenShiftKata
         adjoint auto;
     }
 
+    // Implement a quadratic boolean function oracle.
+    // Q is an upper triangular matrix of 0's and 1's with 0's along the diagonal.
+    // L is a row vector of 0's and 1's
+    operation QuadraticOracle(x : Qubit[], target : Qubit, Q : Int[][], L : Int[]) : Unit {
+        body (...) {
+            let N = Length(x);
+            AssertIntEqual(N, Length(L), "The length of x and L must be equal");
+            AssertIntEqual(N, Length(Q), "The length of x and Q must be equal");
+            AssertIntEqual(Length(Q), Length(Q[0]), "Q must be a square matrix");
+            for (j in 0 .. N-1) {
+                if (L[j] == 1) {
+                    CNOT(x[j], target);
+                }
+                for (i in 0 .. j - 1) {
+                    if (Q[i][j] == 1) {
+                        CCNOT(x[i], x[j], target);
+                    }
+                }
+            }
+        }
+        controlled adjoint auto;
+        controlled auto;
+        adjoint auto;
+    }
+
     // Given an integer s, prepare the given qubit register with the integer in little endian order.
     operation PrepareQubitFromInt(qs : Qubit[], s : Int) : Unit {
         body (...) {
@@ -62,7 +87,7 @@ namespace HiddenShiftKata
         controlled auto;
     }
 
-    // Returns the shifted oracle g for a marking oralce f such that g(x) = f(x + s).
+    // Returns the shifted oracle g for a marking oracle f such that g(x) = f(x + s).
     function ShiftedOracle(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int) : ((Qubit[], Qubit) => Unit : Controlled) {
         return ShiftedOracleHelper(f, s, _, _);
     }
