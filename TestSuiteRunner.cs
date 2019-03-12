@@ -23,6 +23,15 @@ namespace HiddenShiftKata
         [OperationDriver(TestNamespace = "HiddenShiftKata")]
         public void TestTarget(TestOperation op)
         {
+            var hi = BooleanFunction.GetBent(4);
+            System.Console.WriteLine("Count: " + ((System.Collections.Generic.List<BooleanFunction>)hi).Count);
+            foreach (var a in hi) {
+                System.Console.WriteLine("function:");
+                foreach (var b in a) {
+                    System.Console.WriteLine(b);
+                }
+                System.Console.WriteLine();
+            }
             using (var sim = new QuantumSimulator())
             {
                 // OnLog defines action(s) performed when Q# test calls function Message
