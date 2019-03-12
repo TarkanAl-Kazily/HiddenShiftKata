@@ -4,15 +4,27 @@ using System;
 
 namespace HiddenShiftKata {
     class BooleanFunction : IEnumerable<BitString> {
+        public delegate bool FunctionImplementation(BitString input);
+
         public readonly int N;
         public int Range {
             get => 2 << (N - 1);
         }
         public int HighInputsCount {
-            get => _vals.Count;
+            get {
+                if (_vals == null) {
+                    CharacterizeFunction();
+                }
+                return _vals.Count;
+            }
         }
         public int LowInputsCount {
-            get => Range - _vals.Count;
+            get {
+                if (_vals == null) {
+                    CharacterizeFunction();
+                }
+                return Range - _vals.Count;
+            }
         }
         public bool Bent {
             get {
@@ -23,7 +35,8 @@ namespace HiddenShiftKata {
             }
         }
         private bool? _bent = null;
-        private HashSet<BitString> _vals;
+        private HashSet<BitString> _vals = null;
+        private FunctionImplementation _compute = null;
 
         public BooleanFunction(IEnumerable<BitString> vals, int n) {
             _vals = new HashSet<BitString>(vals);
@@ -33,6 +46,11 @@ namespace HiddenShiftKata {
         public BooleanFunction(HashSet<BitString> vals, int n, bool stealref=false) {
             if (stealref) { _vals = vals; }
             else { _vals = new HashSet<BitString>(vals); }
+            N = n;
+        }
+
+        public BooleanFunction(FunctionImplementation implementation, int n) {
+            _compute = implementation;
             N = n;
         }
 
@@ -46,8 +64,10 @@ namespace HiddenShiftKata {
             return this.GetEnumerator();
         }
 
-        // logarathmic execution time, this isn't the reason for this implementation
         public bool Evaluate(BitString arg) {
+            if (_compute != null) {
+                return _compute(arg);
+            }
             return _vals.Contains(arg);
         }
 
@@ -77,6 +97,19 @@ namespace HiddenShiftKata {
                 if (temp != wv) { return false; }
             }
             return true;
+        }
+
+        private void CharacterizeFunction() {
+            HashSet<BitString> high_inputs = new HashSet<BitString>();
+            for (int i = 0; i < Range; i++) {
+                BitString input = BitString.GetBitString(i, N);
+                if (_compute(input)) { high_inputs.Add(input); }
+            }
+            _vals = high_inputs;
+        }
+
+        private void GenerateDNFImplementation() {
+            throw new NotImplementedException();
         }
 
         // the exponents' exponents have exponents
