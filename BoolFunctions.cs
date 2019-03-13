@@ -8,23 +8,13 @@ namespace HiddenShiftKata {
 
         public readonly int N;
         public int Range {
-            get => 2 << (N - 1);
+            get => 1 << N;
         }
         public int HighInputsCount {
-            get {
-                if (_vals == null) {
-                    CharacterizeFunction();
-                }
-                return _vals.Count;
-            }
+            get => _vals.Count;
         }
         public int LowInputsCount {
-            get {
-                if (_vals == null) {
-                    CharacterizeFunction();
-                }
-                return Range - _vals.Count;
-            }
+            get => Range - _vals.Count;
         }
         public bool Bent {
             get {
@@ -35,7 +25,18 @@ namespace HiddenShiftKata {
             }
         }
         private bool? _bent = null;
-        private HashSet<BitString> _vals = null;
+        private HashSet<BitString> _vals {
+            get {
+                if (_hidden_vals == null) {
+                    CharacterizeFunction();
+                }
+                return _vals;
+            }
+            set{
+                _hidden_vals = value;
+            }
+        }
+        private HashSet<BitString> _hidden_vals = null;
         private FunctionImplementation _compute = null;
 
         public BooleanFunction(IEnumerable<BitString> vals, int n) {
@@ -52,6 +53,15 @@ namespace HiddenShiftKata {
         public BooleanFunction(FunctionImplementation implementation, int n) {
             _compute = implementation;
             N = n;
+        }
+
+        public BooleanFunction Shift(int s) {
+            BitString shift = BitString.GetBitString(s, N);
+            HashSet<BitString> new_function = new HashSet<BitString>();
+            foreach (BitString val in _vals) {
+                new_function.Add(val + shift);
+            }
+            return new BooleanFunction(new_function, N);
         }
 
         public IEnumerator<BitString> GetEnumerator() {
@@ -118,7 +128,7 @@ namespace HiddenShiftKata {
         // I'll be surprised if this runs for n = 4
         public static IEnumerable<BooleanFunction> GetBent(int n) {
             List<BooleanFunction> result = new List<BooleanFunction>();
-            int range = 2 << (n - 1);
+            int range = 1 << n;
             bool[] selection = new bool[range];
             HashSet<BitString> positive_vals = new HashSet<BitString>();
             if (new BooleanFunction(positive_vals, n, true).Bent) {
@@ -156,6 +166,10 @@ namespace HiddenShiftKata {
 
         public static bool operator *(BitString a, BitString b) {
             return a.DotProduct(b);
+        }
+
+        public static BitString operator +(BitString a, BitString b) {
+            return a.XORProduct(b);
         }
 
         public bool[] Value {
@@ -199,6 +213,14 @@ namespace HiddenShiftKata {
                 product ^= (_val[i] & other[i]);
             }
             return product;
+        }
+
+        public BitString XORProduct(BitString other) {
+            bool[] product = new bool[Length];
+            for (int i = 0; i < Length; i++) {
+                product[i] = _val[i] ^ other[i];
+            }
+            return BitString.GetBitString(product);
         }
 
         public override string ToString() {
