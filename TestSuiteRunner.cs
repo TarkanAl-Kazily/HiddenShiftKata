@@ -31,5 +31,18 @@ namespace HiddenShiftKata
                 op.TestOperationRunner(sim);
             }
         }
+
+        // Use another namespace so tests are seperated in VSTest
+        [OperationDriver(TestNamespace = "HiddenShiftKata.GaussianEliminationTests")]
+        public void TestGaussianElimination(TestOperation op)
+        {
+            using (var sim = new QuantumSimulator())
+            {
+                // OnLog defines action(s) performed when Q# test calls function Message
+                sim.OnLog += (msg) => { output.WriteLine(msg); };
+                sim.OnLog += (msg) => { Debug.WriteLine(msg); };
+                op.TestOperationRunner(sim);
+            }
+        }
     }
 }
