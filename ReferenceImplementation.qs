@@ -16,7 +16,7 @@ namespace HiddenShiftKata
     // Implement the inner product oracle, which is the most basic kind
     // of bent function.
     // The dual of the inner product function is itself.
-    operation InnerProductOracle(x : Qubit[], target : Qubit) : Unit {
+    operation InnerProductOracleReference(x : Qubit[], target : Qubit) : Unit {
         body (...) {
             let N = Length(x);
             AssertBoolEqual(((N % 2) == 0) && (N > 0), true, "The number of input qubits must be even and positive");
@@ -32,7 +32,7 @@ namespace HiddenShiftKata
     // Implement a quadratic boolean function oracle.
     // Q is an upper triangular matrix of 0's and 1's with 0's along the diagonal.
     // L is a row vector of 0's and 1's
-    operation QuadraticOracle(x : Qubit[], target : Qubit, Q : Int[][], L : Int[]) : Unit {
+    operation QuadraticOracleReference(x : Qubit[], target : Qubit, Q : Int[][], L : Int[]) : Unit {
         body (...) {
             let N = Length(x);
             AssertIntEqual(N, Length(L), "The length of x and L must be equal");
@@ -69,7 +69,7 @@ namespace HiddenShiftKata
         adjoint auto;
     }
 
-    operation ShiftedOracleHelper(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int, x : Qubit[], target : Qubit) : Unit {
+    operation ShiftedOracleHelperReference(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int, x : Qubit[], target : Qubit) : Unit {
         body (...) {
             let N = Length(x);
             using (qs = Qubit[N]) {
@@ -88,11 +88,11 @@ namespace HiddenShiftKata
     }
 
     // Returns the shifted oracle g for a marking oracle f such that g(x) = f(x + s).
-    function ShiftedOracle(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int) : ((Qubit[], Qubit) => Unit : Controlled) {
-        return ShiftedOracleHelper(f, s, _, _);
+    function ShiftedOracleReference(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int) : ((Qubit[], Qubit) => Unit : Controlled) {
+        return ShiftedOracleHelperReference(f, s, _, _);
     }
 
-    operation PhaseFlipOracleHelper(f : ((Qubit[], Qubit) => Unit : Controlled), x : Qubit[]) : Unit {
+    operation PhaseFlipOracleHelperReference(f : ((Qubit[], Qubit) => Unit : Controlled), x : Qubit[]) : Unit {
         body (...) {
             let N = Length(x);
             using (b = Qubit()) {
@@ -107,8 +107,8 @@ namespace HiddenShiftKata
     }
 
     // Returns the phase flip oracle corresponding to the marking oracle f.
-    function PhaseFlipOracle(f : ((Qubit[], Qubit) => Unit : Controlled)) : ((Qubit[]) => Unit : Controlled) {
-        return PhaseFlipOracleHelper(f, _);
+    function PhaseFlipOracleReference(f : ((Qubit[], Qubit) => Unit : Controlled)) : ((Qubit[]) => Unit : Controlled) {
+        return PhaseFlipOracleHelperReference(f, _);
     }
 
     //--------------------------------------------------------------------
