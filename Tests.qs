@@ -6,14 +6,22 @@
 
     operation AlgorithmOneTest () : Unit {
         for (N in 2 .. 2 .. 4) {
-            for (s in 0 .. 2^N - 1) {
+            for (i in 0 .. 2^N - 1) {
+                mutable s = new Int[N];
+                for (j in 0 .. N-1) {
+                    if ((i >>> j) % 2 == 1) {
+                        set s[j] = 1;
+                    }
+                }
                 let f = InnerProductOracle(_, _);
-                let g = ShiftedOracleReference(f, s);
+                let g = ShiftedOracle(f, s);
                 let phasef = PhaseFlipOracle(f);
                 let phaseg = PhaseFlipOracle(g);
-                let res = AlgorithmOne(N, phasef, phaseg);
-                if (not (res == s)) {
-                    Message($"{N}: {res} not equal to s = {s}");
+                let res = DeterministicHiddenShiftSolution_Reference(N, phasef, phaseg);
+                for (j in 0 .. N-1) {
+                    if (not (res[j] == s[j])) {
+                        fail $"Returned {res}. Expected {s}";
+                    }
                 }
             }
         }

@@ -32,7 +32,7 @@ namespace HiddenShiftKata
     // Inputs:
     //      1) N qubits in arbitrary state |x> (input register) (N is even)
     //      2) a qubit in arbitrary state |target> (output qubit)
-    // Goal: transform state |x, target> into state |x, target + f(x)> (+ is addition modulo 2).
+    // Goal: transform state |x>|target> into state |x>|target + f(x)> (+ is addition modulo 2).
     operation InnerProductOracle(x : Qubit[], target : Qubit) : Unit {
         body (...) {
             // ...
@@ -51,7 +51,7 @@ namespace HiddenShiftKata
     //      2) a qubit in arbitrary state |target> (output qubit)
     //      3) an upper triangular N by N matrix Q with 0s along the diagonal
     //      4) an N length vector L
-    // Goal: transform state |x, target> into state |x, target + f(x)> (+ is addition modulo 2).
+    // Goal: transform state |x>|target> into state |x>|target + f(x)> (+ is addition modulo 2).
     operation QuadraticOracle(x : Qubit[], target : Qubit, Q : Int[][], L : Int[]) : Unit {
         body (...) {
             // ...
@@ -61,21 +61,40 @@ namespace HiddenShiftKata
         adjoint auto;
     }
 
-    // Task 1.3: Phase Flip Oracles
+    // Task 1.3: Shifted Oracles
+    // Given a marking oracle f that takes |x>|y> to |x>|y + f(x)>
+    // and a shift s, return a marking oracle that takes |x>|y> to |x>|y + g(x)>
+    // where g(x) = f(x + s).
+    //
+    // This task is used as a setup to the Hidden Shift Problem, but is not part of
+    // the quantum algorithm solution.
+    //
+    // Inputs:
+    //      1) a marking oracle f
+    //      2) an Int array giving a bit string s in {0, 1}^n, where n is the dimension of the domain of f.
+    // Goal: return an oracle that transforms state |x>|y> into state |x>|y + g(x)>
+    function ShiftedOracle(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int[]) : ((Qubit[], Qubit) => Unit : Controlled) {
+        // ...
+        // This task returns a NoOp so that it compiles. You'll likely
+        // need to return your own operation in order to get this to work.
+        return NoOp<(Qubit[], Qubit)>;
+    }
+
+    // Task 1.4: Phase Flip Oracles
     // Given a marking oracle f that takes |x>|y> to |x>|y + f(x)>,
-    // return a phase flip oracle that takes |x> to (-1)^
+    // return a phase flip oracle that takes |x> to (-1)^f(x) |x>
     // Inputs:
     //      1) a marking oracle f
     // Goal: return an oracle that transforms state |x> into state (-1)^f(x) |x>
     function PhaseFlipOracle(f : ((Qubit[], Qubit) => Unit : Controlled)) : ((Qubit[]) => Unit : Controlled) {
         // ...
-        // This task returns the identity gate so that it compiles. You'll likely
+        // This task returns a NoOp so that it compiles. You'll likely
         // need to return your own operation in order to get this to work.
-        return ApplyToEachCA(I, (_));
+        return NoOp<(Qubit[])>;
     }
 
     //////////////////////////////////////////////////////////////////
-    // Part II. Deterministic Correlation Based Solution to the Hidden Shift Problem
+    // Part II. Deterministic Solution to the Hidden Shift Problem
     //////////////////////////////////////////////////////////////////
 
     // Task 2.1. Implement the Walsh-Hadamard Transform
@@ -93,9 +112,9 @@ namespace HiddenShiftKata
         // ...
     }
 
-    // Task 2.2. Implementing the quantum algorithm for the hidden shift problem
+    // Task 2.2. Implementing the deterministic quantum algorithm for the Hidden Shift Problem
     // Inputs:
-    //      1) the number of qubits in the input register N for the functions f and g.
+    //      1) the number of qubits in the input register N for the functions f, fd, and g.
     //      2) a quantum operation which implements the oracle |x⟩ -> (-1)^g(x)|x⟩, where
     //         x is N-qubit input register and g is a bent boolean function
     //         from N-bit strings into {0, 1}
@@ -112,7 +131,7 @@ namespace HiddenShiftKata
     //
     // Output:
     //      The bits string s.
-    operation CorrelationBasedHiddenShiftSolution (N : Int, Ug : ((Qubit[]) => Unit), Ufd : ((Qubit[]) => Unit)) : Int[] {
+    operation DeterministicHiddenShiftSolution (N : Int, Ug : ((Qubit[]) => Unit), Ufd : ((Qubit[]) => Unit)) : Int[] {
         
         // Declare an Int array in which the result will be stored;
         // the array has to be mutable to allow updating its elements.
