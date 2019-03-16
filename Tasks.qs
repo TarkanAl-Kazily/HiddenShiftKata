@@ -73,7 +73,7 @@ namespace HiddenShiftKata
     //      1) a marking oracle f
     //      2) an Int array giving a bit string s in {0, 1}^n, where n is the dimension of the domain of f.
     // Goal: return an oracle that transforms state |x>|y> into state |x>|y + g(x)>
-    function ShiftedOracle(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int[]) : ((Qubit[], Qubit) => Unit : Controlled) {
+    function ShiftedOracle(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), s : Int[]) : ((Qubit[], Qubit) => Unit : Adjoint, Controlled) {
         // ...
         // This task returns a NoOp so that it compiles. You'll likely
         // need to return your own operation in order to get this to work.
@@ -86,7 +86,7 @@ namespace HiddenShiftKata
     // Inputs:
     //      1) a marking oracle f
     // Goal: return an oracle that transforms state |x> into state (-1)^f(x) |x>
-    function PhaseFlipOracle(f : ((Qubit[], Qubit) => Unit : Controlled)) : ((Qubit[]) => Unit : Controlled) {
+    function PhaseFlipOracle(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled)) : ((Qubit[]) => Unit : Adjoint, Controlled) {
         // ...
         // This task returns a NoOp so that it compiles. You'll likely
         // need to return your own operation in order to get this to work.

@@ -13,6 +13,8 @@ namespace HiddenShiftKata
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Extensions.Diagnostics;
 
+    //--------------------------------------------------------------------
+
     // Implement the inner product oracle, which is the most basic kind
     // of bent function.
     // The dual of the inner product function is itself.
@@ -54,22 +56,9 @@ namespace HiddenShiftKata
         adjoint auto;
     }
 
-    // Given an integer s, prepare the given qubit register with the integer in little endian order.
-    operation PrepareQubitFromInt(qs : Qubit[], s : Int) : Unit {
-        body (...) {
-            let N = Length(qs);
-            for (i in 0 .. N - 1)  {
-                if (((s >>> i) % 2) == 1) {
-                    X(qs[i]);
-                }
-            }
-        }
-        controlled adjoint auto;
-        controlled auto;
-        adjoint auto;
-    }
+    //--------------------------------------------------------------------
 
-    operation ShiftedOracle_Helper_Reference(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int[], x : Qubit[], target : Qubit) : Unit {
+    operation ShiftedOracle_Helper_Reference(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), s : Int[], x : Qubit[], target : Qubit) : Unit {
         body (...) {
             let N = Length(x);
             using (qs = Qubit[N]) {
@@ -92,15 +81,17 @@ namespace HiddenShiftKata
                 }
             }
         }
+        controlled adjoint auto;
         controlled auto;
+        adjoint auto;
     }
 
     // Returns the shifted oracle g for a marking oracle f such that g(x) = f(x + s).
-    function ShiftedOracle_Reference(f : ((Qubit[], Qubit) => Unit : Controlled), s : Int[]) : ((Qubit[], Qubit) => Unit : Controlled) {
+    function ShiftedOracle_Reference(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), s : Int[]) : ((Qubit[], Qubit) => Unit : Adjoint, Controlled) {
         return ShiftedOracle_Helper_Reference(f, s, _, _);
     }
 
-    operation PhaseFlipOracle_Helper_Reference(f : ((Qubit[], Qubit) => Unit : Controlled), x : Qubit[]) : Unit {
+    operation PhaseFlipOracle_Helper_Reference(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), x : Qubit[]) : Unit {
         body (...) {
             let N = Length(x);
             using (b = Qubit()) {
@@ -111,19 +102,22 @@ namespace HiddenShiftKata
                 X(b);
             }
         }
+        controlled adjoint auto;
         controlled auto;
+        adjoint auto;
     }
 
     // Returns the phase flip oracle corresponding to the marking oracle f.
-    function PhaseFlipOracle_Reference(f : ((Qubit[], Qubit) => Unit : Controlled)) : ((Qubit[]) => Unit : Controlled) {
+    function PhaseFlipOracle_Reference(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled)) : ((Qubit[]) => Unit : Adjoint, Controlled) {
         return PhaseFlipOracle_Helper_Reference(f, _);
     }
+
+    //--------------------------------------------------------------------
 
     operation WalshHadamard_Reference (x : Qubit[]) : Unit {
         ApplyToEach(H, x);
     }
 
-    //--------------------------------------------------------------------
     // Determines the hidden shift s from the oracle for g(x) and the daul of f(x).
     operation DeterministicHiddenShiftSolution_Reference (N : Int, Ug : ((Qubit[]) => Unit), Ufd : ((Qubit[]) => Unit)) : Int[] {
         mutable res = new Int[N];
