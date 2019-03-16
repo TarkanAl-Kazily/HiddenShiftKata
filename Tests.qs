@@ -142,6 +142,15 @@
 
     //--------------------------------------------------------------------
 
+    operation PhaseFlipOracle_Test () : Unit {
+        let f = InnerProductOracle_Reference(_, _);
+        let fphased = PhaseFlipOracle(f);
+        let expected = PhaseFlipOracle_Reference(f);
+        for (N in 2 .. 2 .. 6) {
+            AssertOperationsEqualReferenced(fphased, expected, N);
+        }
+    }
+
     //--------------------------------------------------------------------
 
     operation DeterministicHiddenShiftSolution_TestCase (s : Int[]) : Unit {
