@@ -75,8 +75,60 @@ namespace HiddenShiftKata
     }
 
     //////////////////////////////////////////////////////////////////
-    // Part II. Correlation Based Solution to the Hidden Shift Problem
+    // Part II. Deterministic Correlation Based Solution to the Hidden Shift Problem
     //////////////////////////////////////////////////////////////////
+
+    // Task 2.1. Implement the Walsh-Hadamard Transform
+    // Inputs:
+    //      1) N qubits in arbitrary state |x>
+    //
+    // Goal: Transform the state according to the Walsh-Hadamard Transform.
+    //       The matrix form of the Walsh-Hadamard transform is given by
+    //
+    //      (1/Sqrt(2^n)) Sum_{x, y in {0, 1}^n} (-1)^(x, y) |x><y|
+    //
+    //      where (x, y) is the binary inner product of bit strings.
+    operation WalshHadamard (x : Qubit[]) : Unit {
+        // Hint: how is the Walsh-Hadamard transform written as a tensor product?
+        // ...
+    }
+
+    // Task 2.2. Implementing the quantum algorithm for the hidden shift problem
+    // Inputs:
+    //      1) the number of qubits in the input register N for the functions f and g.
+    //      2) a quantum operation which implements the oracle |x⟩ -> (-1)^g(x)|x⟩, where
+    //         x is N-qubit input register and g is a bent boolean function
+    //         from N-bit strings into {0, 1}
+    //      3) a quantum operation which implements the oracle |x⟩ -> (-1)^fd(x)|x⟩, where
+    //         x is N-qubit input register and fd is the dual of f, which is a bent boolean
+    //         function from N-bit strings into {0, 1}
+    //
+    // The function g is guaranteed to satisfy the following property:
+    // there exists some N-bit string s such that for all N-bit strings x we have
+    // g(x) = f(x+s)
+    //
+    // Examples of bent boolean functions are the functions from task 1.1 and 1.2;
+    // In the case of the inner product function, it is its own dual function.
+    //
+    // Output:
+    //      The bits string s.
+    operation CorrelationBasedHiddenShiftSolution (N : Int, Ug : ((Qubit[]) => Unit), Ufd : ((Qubit[]) => Unit)) : Int[] {
+        
+        // Declare an Int array in which the result will be stored;
+        // the array has to be mutable to allow updating its elements.
+        mutable s = new Int[N];
+        
+        // Hint: Produce a uniform superposition on all states;
+        //       Apply Ug;
+        //       Apply the Walsh transform;
+        //       Apply Ufd;
+        //       Apply the Walsh transform;
+        //       Measure out s.
+        // ...
+
+        return s;
+    }
+
 
     //////////////////////////////////////////////////////////////////
     // Part III. Hidden Subgroup Based Solution to the Hidden Shift Problem
