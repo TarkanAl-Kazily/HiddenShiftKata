@@ -115,7 +115,10 @@ namespace HiddenShiftKata
     //--------------------------------------------------------------------
 
     operation WalshHadamard_Reference (x : Qubit[]) : Unit {
-        ApplyToEach(H, x);
+        body (...) {
+            ApplyToEachA(H, x);
+        }
+        adjoint auto;
     }
 
     // Determines the hidden shift s from the oracle for g(x) and the daul of f(x).

@@ -153,6 +153,12 @@
 
     //--------------------------------------------------------------------
 
+    operation WalshHadamard_Test () : Unit {
+        for (N in 1 .. 6) {
+            AssertOperationsEqualReferenced(WalshHadamard, WalshHadamard_Reference, N);
+        }
+    }
+
     operation DeterministicHiddenShiftSolution_TestCase (s : Int[]) : Unit {
         let N = Length(s);
         let f = InnerProductOracle(_, _);
