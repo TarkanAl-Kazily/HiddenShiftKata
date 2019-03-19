@@ -1,4 +1,4 @@
-﻿namespace HiddenShiftKata.GaussianEliminationMod2Tests
+﻿namespace HiddenShiftKata.GaussianEliminationTests
 {
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Canon;
