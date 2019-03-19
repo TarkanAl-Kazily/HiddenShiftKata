@@ -99,6 +99,7 @@
 	/// </code>
 	/// </summary>
 	function GaussianEliminationMod2(matrix_: Int[][]) : Int[][] {
+        Message($"{matrix_}");
 		mutable matrix = matrix_;
 		mutable minPivotRow = 0;
 		for (column in 0..Length(matrix[0])-1) {

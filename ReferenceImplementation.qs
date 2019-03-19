@@ -180,20 +180,27 @@ namespace HiddenShiftKata
 			for (i in 0..n) {
 				set result[i] = M(cosetReg[i]) == One ? 1 | 0;
 			}
+
+            ResetAll(cosetReg);
+            ResetAll(targetReg);
         }
         return result;
 	}
 
 	operation GeneralizedHiddenShift_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
-		mutable results = new Int[][n]; // We only need n bits in our kernel
+		mutable results = new Int[][n+1];
+        for (i in 0 .. Length(results) - 1) {
+            set results[i] = new Int[n+1];
+        }
 		repeat {
 			let newResult = HiddenShiftIteration_Reference(n, oraclef, oracleg);
-			
+
 			let currentRank = RankMod2(results);
 			set results[currentRank] = newResult;
 		} until (Length(KernelMod2(results)) == 1)
 		fixup {}
 
+        Message($"Kernel:{KernelMod2(results)}");
 		return (KernelMod2(results))[0];
 	}
 }
