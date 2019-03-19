@@ -1,4 +1,4 @@
-﻿namespace HiddenShiftKata.GaussianEliminationTests
+﻿namespace HiddenShiftKata.GaussianEliminationMod2Tests
 {
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Canon;
@@ -6,129 +6,129 @@
 
     operation BasicTest () : Unit
     {
-        let result = GaussianElimination([
-			[true, false],
-			[true, true]
+        let result = GaussianEliminationMod2([
+			[1, 0],
+			[1, 1]
 		]);
 
-		AssertBoolMatrixEqual(result, [
-			[true, false],
-			[false, true]
+		AssertIntMatrixEqual(result, [
+			[1, 0],
+			[0, 1]
 		], "");
     }
 
-	operation OnlyFlipIfTrueTest () : Unit
+	operation OnlyFlipIf1Test () : Unit
     {
-		// In the second column, only one value is true, so none of the rows should be modified
-        let result = GaussianElimination([
-			[true, false, true, false],
-			[false, true, true, false],
-			[false, false, false, false]
+		// In the second column, only one value is 1, so none of the rows should be modified
+        let result = GaussianEliminationMod2([
+			[1, 0, 1, 0],
+			[0, 1, 1, 0],
+			[0, 0, 0, 0]
 		]);
 
-		AssertBoolMatrixEqual(result, [
-			[true, false, true, false],
-			[false, true, true, false],
-			[false, false, false, false]
+		AssertIntMatrixEqual(result, [
+			[1, 0, 1, 0],
+			[0, 1, 1, 0],
+			[0, 0, 0, 0]
 		], "");
     }
 
-	operation FlipIfTrueTest () : Unit
+	operation FlipIf1Test () : Unit
     {
 		// In the second column, both the first and third rows and added with the second
-        let result = GaussianElimination([
-			[true, true, true, false],
-			[false, true, true, false],
-			[false, true, false, false]
+        let result = GaussianEliminationMod2([
+			[1, 1, 1, 0],
+			[0, 1, 1, 0],
+			[0, 1, 0, 0]
 		]);
 
-		AssertBoolMatrixEqual(result, [
-			[true, false, false, false],
-			[false, true, false, false],
-			[false, false, true, false]
+		AssertIntMatrixEqual(result, [
+			[1, 0, 0, 0],
+			[0, 1, 0, 0],
+			[0, 0, 1, 0]
 		], "");
     }
 
 	operation DoSwapsTest() : Unit
     {
 		// In the second column, both the first and third rows and added with the second
-        let result = GaussianElimination([
-			[false, false, true, false],
-			[false, true, false, false],
-			[true, false, false, false]
+        let result = GaussianEliminationMod2([
+			[0, 0, 1, 0],
+			[0, 1, 0, 0],
+			[1, 0, 0, 0]
 		]);
 
-		AssertBoolMatrixEqual(result, [
-			[true, false, false, false],
-			[false, true, false, false],
-			[false, false, true, false]
+		AssertIntMatrixEqual(result, [
+			[1, 0, 0, 0],
+			[0, 1, 0, 0],
+			[0, 0, 1, 0]
 		], "");
     }
 	
 	operation EliminateRowTest() : Unit
     {
-        let result = GaussianElimination([
-			[false, false, true, false],
-			[false, true, false, false],
-			[false, true, false, false],
-			[true, false, false, false]
+        let result = GaussianEliminationMod2([
+			[0, 0, 1, 0],
+			[0, 1, 0, 0],
+			[0, 1, 0, 0],
+			[1, 0, 0, 0]
 		]);
 
-		AssertBoolMatrixEqual(result, [
-			[true, false, false, false],
-			[false, true, false, false],
-			[false, false, true, false],
-			[false, false, false, false]
+		AssertIntMatrixEqual(result, [
+			[1, 0, 0, 0],
+			[0, 1, 0, 0],
+			[0, 0, 1, 0],
+			[0, 0, 0, 0]
 		], "");
     }
 
 	operation BasicKernelTest() : Unit
     {
-        let result = Kernel([
-			[true, false, false, false],
-			[false, true, false, false],
-			[false, false, true, false],
-			[false, false, false, false]
+        let result = KernelMod2([
+			[1, 0, 0, 0],
+			[0, 1, 0, 0],
+			[0, 0, 1, 0],
+			[0, 0, 0, 0]
 		]);
 
 		AssertSubspaceEqual(result, [
-			[false, false, false, true]
+			[0, 0, 0, 1]
 		], "");
     }
 
 	operation TrickyKernelTest() : Unit
     {
-        let result = Kernel([
-			[true, false, false, true],
-			[false, true, true, true]
+        let result = KernelMod2([
+			[1, 0, 0, 1],
+			[0, 1, 1, 1]
 		]);
 		
 		AssertSubspaceEqual(result, [
-			[true, true, false, true],
-			[false, true, true, false]
+			[1, 1, 0, 1],
+			[0, 1, 1, 0]
 		], "");
     }
 	
 
-	function AssertBoolMatrixEqual(actual: Bool[][], expected: Bool[][], message: String) : Unit {
+	function AssertIntMatrixEqual(actual: Int[][], expected: Int[][], message: String) : Unit {
 		AssertIntEqual(Length(actual), Length(expected), message);
 		for (i in 0..Length(actual)-1) {
-			AssertBoolArrayEqual(actual[i], expected[i], message);
+			AssertBoolEqual(IntVectorEqual(actual[i], expected[i]), true, message);
 		}
 	}
 
-	function AssertSubspaceEqual(actualBasis: Bool[][], expectedBasis: Bool[][], message: String) : Unit {
+	function AssertSubspaceEqual(actualBasis: Int[][], expectedBasis: Int[][], message: String) : Unit {
 		AssertIntEqual(Length(actualBasis), Length(expectedBasis), message);
 		for (i in 0..Length(actualBasis)-1) {
 			mutable foundMatch = false;
 			for (j in 0..Length(expectedBasis) - 1) {
-				set foundMatch = foundMatch || BoolVectorEqual(actualBasis[i], expectedBasis[j]);
+				set foundMatch = foundMatch || IntVectorEqual(actualBasis[i], expectedBasis[j]);
 			}
 			AssertBoolEqual(foundMatch, true, message);
 		}
 	}
 
-	function BoolVectorEqual(a: Bool[], b: Bool[]) : Bool {
+	function IntVectorEqual(a: Int[], b: Int[]) : Bool {
 		if (Length(a) != Length(b)) {
 			return false;
 		}

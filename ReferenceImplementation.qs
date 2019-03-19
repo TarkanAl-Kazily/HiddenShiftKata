@@ -166,10 +166,34 @@ namespace HiddenShiftKata
         return HidingFunctionOracle_Helper_Reference(f, g, _, _, _);
     }
 
-	operation IterativeHiddenShiftSolution_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Controlled), oracleg : ((Qubit[]) => Unit : Controlled)) : Int[] {
-        using ((cosetReg, targetReg) = (Qubit[n+1], Qubit[n])) {
+	operation HiddenShiftIteration_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
+		mutable result = new Int[n+1];
 
+        using ((cosetReg, targetReg) = (Qubit[n+1], Qubit[n])) {
+			ApplyToEach(H, cosetReg);
+
+			let h = HidingFunctionOracle_Reference(oraclef, oracleg);
+			h(cosetReg[0], cosetReg[1..Length(cosetReg)-1], targetReg);
+
+			ApplyToEach(H, cosetReg);
+
+			for (i in 0..n) {
+				set result[i] = M(cosetReg[i]) == One ? 1 | 0;
+			}
         }
-        return [42];
+        return result;
+	}
+
+	operation GeneralizedHiddenShift_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
+		mutable results = new Int[][n]; // We only need n bits in our kernel
+		repeat {
+			let newResult = HiddenShiftIteration_Reference(n, oraclef, oracleg);
+			
+			let currentRank = RankMod2(results);
+			set results[currentRank] = newResult;
+		} until (Length(KernelMod2(results)) == 1)
+		fixup {}
+
+		return (KernelMod2(results))[0];
 	}
 }
