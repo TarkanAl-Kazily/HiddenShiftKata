@@ -12,7 +12,7 @@
 	/// let matrix = [
 	///     [1, 0, 0, 0],
 	///     [0, 1, 0, 0]
-	/// ]
+	/// ];
 	/// let kernel = KernelMod2(matrix);
 	/// </code>
 	///
@@ -48,7 +48,7 @@
 	///     [1, 1, 0, 0],
 	///     [0, 1, 0, 0],
 	///     [0, 0, 0, 0]
-	/// ]
+	/// ];
 	/// let rank = RankMod2(matrix);
 	/// </code>
 	/// <c>rank</c> is now 2.
@@ -86,7 +86,7 @@
 	/// let matrix = [
 	///     [1, 0, 1, 1],
 	///     [0, 1, 1, 0]
-	/// ]
+	/// ];
 	/// let rowReduced = GaussianEliminationMod2(matrix);
 	/// </code>
 	///
@@ -99,7 +99,6 @@
 	/// </code>
 	/// </summary>
 	function GaussianEliminationMod2(matrix_: Int[][]) : Int[][] {
-        Message($"{matrix_}");
 		mutable matrix = matrix_;
 		mutable minPivotRow = 0;
 		for (column in 0..Length(matrix[0])-1) {
@@ -120,9 +119,9 @@
 				let temp = matrix[minPivotRow];
 				set matrix[minPivotRow] = matrix[pivotRow];
 				set matrix[pivotRow] = temp;
-			}
 
-			set minPivotRow = minPivotRow + 1;
+				set minPivotRow = minPivotRow + 1;
+			}
 		}
 
 		return matrix;
