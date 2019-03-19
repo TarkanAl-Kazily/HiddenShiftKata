@@ -179,4 +179,21 @@
         }
     }
 
+    //--------------------------------------------------------------------
+
+    operation HidingFunctionOracle_Test () : Unit {
+        using (b = Qubit()) {
+            // The choices of f and g are arbitrary for testing purposes.
+            let s = [0, 1, 0, 0];
+            let f = InnerProductOracle_Reference(_, _);
+            let g = ShiftedOracle_Reference(f, s);
+            let h = HidingFunctionOracle_Reference(f, g);
+            let nqubits = Length(s);
+
+            AssertTwoOraclesAreEqual(nqubits .. nqubits, f, h(b, _, _));
+            X(b);
+            AssertTwoOraclesAreEqual(nqubits .. nqubits, g, h(b, _, _));
+            X(b);
+        }
+    }
 }

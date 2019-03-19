@@ -137,7 +137,27 @@ namespace HiddenShiftKata
         return res;
     }
 
-	operation IterativeHiddenShiftSolution_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Controlled), oracleg : ((Qubit[]) => Unit : Controlled)) : Int {
+    //--------------------------------------------------------------------
+
+    operation HidingFunctionOracle_Helper_Reference (f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), g : ((Qubit[], Qubit) => Unit : Adjoint, Controlled),
+                                                     b : Qubit, x : Qubit[], target : Qubit) : Unit {
+        body (...) {
+            Controlled g([b], (x, target));
+            X(b);
+            Controlled f([b], (x, target));
+            X(b);
+        }
+        controlled adjoint auto;
+        controlled auto;
+        adjoint auto;
+    }
+
+    function HidingFunctionOracle_Reference (f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), g : ((Qubit[], Qubit) => Unit : Adjoint, Controlled)) :
+            ((Qubit, Qubit[], Qubit) => Unit : Adjoint, Controlled) {
+        return HidingFunctionOracle_Helper_Reference(f, g, _, _, _);
+    }
+
+	operation IterativeHiddenShiftSolution_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Controlled), oracleg : ((Qubit[]) => Unit : Controlled)) : Int[] {
 		// Not sure about the variable names here, we should make sure they're descriptive
 		using ((control, cosetReg, oracleReg) = (Qubit(), Qubit[n+1], Qubit[n])) {
 			ApplyToEach(H, cosetReg);
@@ -154,6 +174,6 @@ namespace HiddenShiftKata
 			ApplyToEach(H, oracleReg);
 		}
 
-		return 42;
+		return [42];
 	}
 }
