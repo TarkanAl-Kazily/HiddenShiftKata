@@ -139,41 +139,37 @@ namespace HiddenShiftKata
 
     //--------------------------------------------------------------------
 
-    operation HidingFunctionOracle_Helper_Reference (f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), g : ((Qubit[], Qubit) => Unit : Adjoint, Controlled),
-                                                     b : Qubit, x : Qubit[], target : Qubit) : Unit {
+    operation HidingFunctionOracle_Helper_Reference (f : ((Qubit[]) => Unit : Adjoint, Controlled), g : ((Qubit[]) => Unit : Adjoint, Controlled),
+                                                     b : Qubit, x : Qubit[], target : Qubit[]) : Unit {
         body (...) {
-            Controlled g([b], (x, target));
+            ApplyToEachCA(H, target);
+            for (i in 0 .. Length(x) - 1) {
+                CNOT(x[i], target[i]);
+            }
+
+            Controlled g([b], (target));
             X(b);
-            Controlled f([b], (x, target));
+            Controlled f([b], (target));
             X(b);
+
+            for (i in 0 .. Length(x) - 1) {
+                CNOT(x[i], target[i]);
+            }
         }
         controlled adjoint auto;
         controlled auto;
         adjoint auto;
     }
 
-    function HidingFunctionOracle_Reference (f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), g : ((Qubit[], Qubit) => Unit : Adjoint, Controlled)) :
-            ((Qubit, Qubit[], Qubit) => Unit : Adjoint, Controlled) {
+    function HidingFunctionOracle_Reference (f : ((Qubit[]) => Unit : Adjoint, Controlled), g : ((Qubit[]) => Unit : Adjoint, Controlled)) :
+            ((Qubit, Qubit[], Qubit[]) => Unit : Adjoint, Controlled) {
         return HidingFunctionOracle_Helper_Reference(f, g, _, _, _);
     }
 
 	operation IterativeHiddenShiftSolution_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Controlled), oracleg : ((Qubit[]) => Unit : Controlled)) : Int[] {
-		// Not sure about the variable names here, we should make sure they're descriptive
-		using ((control, cosetReg, oracleReg) = (Qubit(), Qubit[n+1], Qubit[n])) {
-			ApplyToEach(H, cosetReg);
-			ApplyToEach(H, oracleReg);
+        using ((cosetReg, targetReg) = (Qubit[n+1], Qubit[n])) {
 
-			// Apply f or g
-			(Controlled (oraclef)) (cosetReg, oracleReg);
-			X(control);
-			(Controlled (oracleg)) (cosetReg, oracleReg);
-			X(control);
-
-			H(control);
-			ApplyToEach(H, cosetReg);
-			ApplyToEach(H, oracleReg);
-		}
-
-		return [42];
+        }
+        return [42];
 	}
 }
