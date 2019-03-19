@@ -3,9 +3,21 @@
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Canon;
 
+	/// <summary>
+	/// Returns an array of bool vectors which together form the basis of the null space.
+	/// The input matrix may have any dimensions >= 1. It must be rectangular (and not jagged).
 	///
-	/// Returns an array of bool vectors which together form the basis of the null space
+	/// Example:
+	/// <code>
+	/// let matrix = [
+	///     [1, 0, 0, 0],
+	///     [0, 1, 0, 0]
+	/// ];
+	/// let kernel = KernelMod2(matrix);
+	/// </code>
 	///
+	/// <c>kernel</c> is <c>[[0, 0, 1, 0], [0, 0, 0, 1]]</c>.
+	/// </summary>
 	function KernelMod2(matrix: Int[][]) : Int[][] {
 		let reduced = GaussianEliminationMod2(matrix);
 		let rank = QuickRank(reduced);
@@ -26,11 +38,27 @@
 		return result;
 	}
 
+	/// <summary>
+	/// Computes the rank of the given matrix.
+	/// The input matrix may have any dimensions >= 1. It must be rectangular (and not jagged).	
+	///
+	/// Example:
+	/// <code>
+	/// let matrix = [
+	///     [1, 1, 0, 0],
+	///     [0, 1, 0, 0],
+	///     [0, 0, 0, 0]
+	/// ];
+	/// let rank = RankMod2(matrix);
+	/// </code>
+	/// <c>rank</c> is now 2.
+	/// </summary>
 	function RankMod2(matrix: Int[][]) : Int {
 		return QuickRank(GaussianEliminationMod2(matrix));
 	}
 
-	/// Assumes the matrix is in row echelon form
+	/// Computes the rank of the given matrix. Assumes the matrix is in row echelon form.
+	/// The input matrix may have any dimensions > 1. It must be rectangular (and not jagged).
 	function QuickRank(matrix: Int[][]) : Int {
 		mutable zeroRows = 0;
 		for (i in 0..Length(matrix)-1) {
@@ -48,6 +76,28 @@
 		return Length(matrix) - zeroRows;
 	}
 
+	/// <summary>
+	/// Returns the result of computing Gaussian elimination on the given matrix. 
+	/// Assumes elements of the matrix are in Z2.
+	/// The input matrix may have any dimensions > 1. It must be rectangular (and not jagged).
+	///
+	/// Example:
+	/// <code>
+	/// let matrix = [
+	///     [1, 0, 1, 1],
+	///     [0, 1, 1, 0]
+	/// ];
+	/// let rowReduced = GaussianEliminationMod2(matrix);
+	/// </code>
+	///
+	/// <c>rowReduced</c> is:
+	/// <code>
+	/// [
+	///   [0, 0, 1, 0],
+	///   [0, 0, 0, 1]
+	/// ]
+	/// </code>
+	/// </summary>
 	function GaussianEliminationMod2(matrix_: Int[][]) : Int[][] {
 		mutable matrix = matrix_;
 		mutable minPivotRow = 0;
@@ -69,14 +119,16 @@
 				let temp = matrix[minPivotRow];
 				set matrix[minPivotRow] = matrix[pivotRow];
 				set matrix[pivotRow] = temp;
-			}
 
-			set minPivotRow = minPivotRow + 1;
+				set minPivotRow = minPivotRow + 1;
+			}
 		}
 
 		return matrix;
 	}
 
+	/// Helper function to add a source row into a destination row
+	/// matrix[destRow] += matrix[srcRow]
 	function AddRowsMod2(matrix_: Int[][], srcRow: Int, destRow: Int) : Int[][] {
 		mutable matrix = matrix_;
 		for (col in 0..Length(matrix[0])-1) {

@@ -16,6 +16,32 @@
 			[0, 1]
 		], "");
     }
+	
+	operation FirstColumnHasZerosTest() : Unit
+    {		
+		let result = GaussianEliminationMod2([
+			[0, 1, 1],
+			[0, 0, 1]
+		]);
+
+		AssertIntMatrixEqual(result, [
+			[0, 1, 0],
+			[0, 0, 1]
+		], "");
+    }
+	
+	operation MiddleColumnHasZerosTest() : Unit
+    {		
+		let result = GaussianEliminationMod2([
+			[1, 0, 1],
+			[0, 0, 1]
+		]);
+
+		AssertIntMatrixEqual(result, [
+			[1, 0, 0],
+			[0, 0, 1]
+		], "");
+    }
 
 	operation OnlyFlipIf1Test () : Unit
     {
@@ -108,7 +134,6 @@
 			[0, 1, 1, 0]
 		], "");
     }
-	
 
 	function AssertIntMatrixEqual(actual: Int[][], expected: Int[][], message: String) : Unit {
 		AssertIntEqual(Length(actual), Length(expected), message);

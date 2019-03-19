@@ -196,4 +196,42 @@
             X(b);
         }
     }
+
+    operation HiddenShiftIteration_TestCase (s : Int[]) : Unit {
+        let N = Length(s);
+        let f = InnerProductOracle(_, _);
+        let g = ShiftedOracle(f, s);
+        let phasef = PhaseFlipOracle(f);
+        let phaseg = PhaseFlipOracle(g);
+        let res = HiddenShiftIteration_Reference(N, phasef, phaseg);
+        mutable sum = res[0];
+        for (i in 1 .. N) {
+            set sum = sum + s[i - 1] * res[i];
+        }
+        if (not (sum % 2 == 0)) {
+            fail $"{res} is not orthogonal to (1, {s})";
+        }
+    }
+
+    operation HiddenShiftIteration_Test () : Unit {
+        for (N in 2 .. 2 .. 4) {
+            IterateThroughCartesianPower(N, 2, HiddenShiftIteration_TestCase);
+        }
+    }
+
+    operation GeneralizedHiddenShift_Test () : Unit {
+        let s = [0, 1, 0, 0];
+        let f = InnerProductOracle_Reference(_, _);
+        let g = ShiftedOracle_Reference(f, s);
+        let phasef = PhaseFlipOracle_Reference(f);
+        let phaseg = PhaseFlipOracle_Reference(g);
+
+        let newres = GeneralizedHiddenShift_Reference(Length(s), phasef, phaseg);
+        let res = newres[1..Length(newres)-1];
+        for (i in 0 .. Length(s) - 1) {
+            if (not (s[i] == res[i])) {
+                fail $"Got {newres}. Expected {s}";
+            }
+        }
+    }
 }
