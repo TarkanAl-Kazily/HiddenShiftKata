@@ -108,7 +108,19 @@
 			[0, 1, 1, 0]
 		], "");
     }
-	
+
+	operation NewKernelTest() : Unit
+    {
+        let result = KernelMod2([
+			[1, 0, 0, 1],
+			[0, 1, 1, 1]
+		]);
+		
+		AssertSubspaceEqual(result, [
+			[1, 1, 0, 1],
+			[0, 1, 1, 0]
+		], "");
+    }	
 
 	function AssertIntMatrixEqual(actual: Int[][], expected: Int[][], message: String) : Unit {
 		AssertIntEqual(Length(actual), Length(expected), message);
