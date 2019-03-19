@@ -17,7 +17,7 @@
 		], "");
     }
 	
-	operation ColumnHasZerosTest() : Unit
+	operation FirstColumnHasZerosTest() : Unit
     {		
 		let result = GaussianEliminationMod2([
 			[0, 1, 1],
@@ -26,6 +26,19 @@
 
 		AssertIntMatrixEqual(result, [
 			[0, 1, 0],
+			[0, 0, 1]
+		], "");
+    }
+	
+	operation MiddleColumnHasZerosTest() : Unit
+    {		
+		let result = GaussianEliminationMod2([
+			[1, 0, 1],
+			[0, 0, 1]
+		]);
+
+		AssertIntMatrixEqual(result, [
+			[1, 0, 0],
 			[0, 0, 1]
 		], "");
     }
