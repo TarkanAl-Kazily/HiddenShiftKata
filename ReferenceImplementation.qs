@@ -136,4 +136,24 @@ namespace HiddenShiftKata
         }
         return res;
     }
+
+	operation IterativeHiddenShiftSolution_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Controlled), oracleg : ((Qubit[]) => Unit : Controlled)) : Int {
+		// Not sure about the variable names here, we should make sure they're descriptive
+		using ((control, cosetReg, oracleReg) = (Qubit(), Qubit[n+1], Qubit[n])) {
+			ApplyToEach(H, cosetReg);
+			ApplyToEach(H, oracleReg);
+
+			// Apply f or g
+			(Controlled (oraclef)) (cosetReg, oracleReg);
+			X(control);
+			(Controlled (oracleg)) (cosetReg, oracleReg);
+			X(control);
+
+			H(control);
+			ApplyToEach(H, cosetReg);
+			ApplyToEach(H, oracleReg);
+		}
+
+		return 42;
+	}
 }
