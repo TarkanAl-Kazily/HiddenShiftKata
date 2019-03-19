@@ -38,6 +38,7 @@ namespace HiddenShiftKata
             AssertIntEqual(N, Length(L), "The length of x and L must be equal");
             AssertIntEqual(N, Length(Q), "The length of x and Q must be equal");
             AssertIntEqual(Length(Q), Length(Q[0]), "Q must be a square matrix");
+
             for (j in 0 .. N-1) {
                 if (L[j] == 1) {
                     CNOT(x[j], target);
@@ -126,4 +127,25 @@ namespace HiddenShiftKata
         }
         return res;
     }
+
+	operation IterativeHsp(n: Int, oraclef : ((Qubit[]) => Unit : Controlled), oracleg : ((Qubit[]) => Unit : Controlled)) : Int {
+		using ((control, cosetReg, oracleReg) = (Qubit(), Qubit[n+1], Qubit[n])) {
+			ApplyToEach(H, cosetReg);
+			ApplyToEach(H, oracleReg);
+
+
+
+			// Apply f or g
+			//(Controlled (oraclef)) (cosetReg[n], oracleReg);
+			//X(control);
+			//(Controlled (oracleg)) (cosetReg[n], oracleReg);
+			//X(control);
+
+			//H(control);
+			//ApplyToEach(H, cosetReg);
+			//ApplyToEach(H, oracleReg);
+		}
+
+		return 42;
+	}
 }

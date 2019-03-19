@@ -5,23 +5,18 @@ using System.Diagnostics;
 
 namespace HiddenShiftKata
 {
-    public class TestSuiteRunner
+    public class GaussianEliminationTestSuite
     {
         private readonly ITestOutputHelper output;
 
-        public TestSuiteRunner(ITestOutputHelper output)
+        public GaussianEliminationTestSuite(ITestOutputHelper output)
         {
             this.output = output;
         }
-
-        /// <summary>
-        /// This driver will run all Q# tests (operations named "...Test") 
-        /// that belong to namespace HiddenShiftKata.
-        ///
-        /// To execute your tests, just type "dotnet test" from the command line.
-        /// </summary>
-        [OperationDriver(TestNamespace = "HiddenShiftKata")]
-        public void TestTarget(TestOperation op)
+        
+        // Use another namespace so tests are seperated in VSTest
+        [OperationDriver(TestNamespace = "HiddenShiftKata.GaussianEliminationTests", DisplayName = "Gaussian Elimination")]
+        public void TestGaussianElimination(TestOperation op)
         {
             using (var sim = new QuantumSimulator())
             {
