@@ -196,4 +196,20 @@
             X(b);
         }
     }
+
+    operation GeneralizedHiddenShift_Test () : Unit {
+        let s = [0, 1, 0, 0];
+        let f = InnerProductOracle_Reference(_, _);
+        let g = ShiftedOracle_Reference(f, s);
+        let phasef = PhaseFlipOracle_Reference(f);
+        let phaseg = PhaseFlipOracle_Reference(g);
+
+        let newres = GeneralizedHiddenShift_Reference(Length(s), phasef, phaseg);
+        let res = newres[1..Length(newres)-1];
+        for (i in 0 .. Length(s) - 1) {
+            if (not (s[i] == res[i])) {
+                fail $"Got {newres}. Expected {s}";
+            }
+        }
+    }
 }
