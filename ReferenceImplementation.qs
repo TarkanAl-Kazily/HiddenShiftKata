@@ -200,7 +200,6 @@ namespace HiddenShiftKata
 		} until (Length(KernelMod2(results)) == 1)
 		fixup {}
 
-        Message($"Kernel:{KernelMod2(results)}");
 		return (KernelMod2(results))[0];
 	}
 }

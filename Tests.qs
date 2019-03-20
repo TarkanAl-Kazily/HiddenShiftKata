@@ -226,11 +226,10 @@
         let phasef = PhaseFlipOracle_Reference(f);
         let phaseg = PhaseFlipOracle_Reference(g);
 
-        let newres = GeneralizedHiddenShift_Reference(Length(s), phasef, phaseg);
-        let res = newres[1..Length(newres)-1];
+        let res = (GeneralizedHiddenShift_Reference(Length(s), phasef, phaseg))[1 .. Length(s)];
         for (i in 0 .. Length(s) - 1) {
             if (not (s[i] == res[i])) {
-                fail $"Got {newres}. Expected {s}";
+                fail $"Got {res}. Expected {s}";
             }
         }
     }
