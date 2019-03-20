@@ -22,17 +22,33 @@
 		let reduced = GaussianEliminationMod2(matrix);
 		let rank = QuickRank(reduced);
 		let nullSpaceDims = Length(matrix[0]) - rank;
-		
+
+		// mutable nonPivotsFound = 0;
+		// mutable nonPivots = new Int[nullSpaceDims];
+		// for (i in 0..nullSpaceDims-1) {
+		// 	if (reduced[i][i-nonPivotsFound] == 1) {
+		// 		set nonPivots[nonPivotsFound] = i;
+		// 		set nonPivotsFound = nonPivotsFound + 1;
+		// 	}
+		// }
+
+		mutable nonPivotOffset = 0;
 		mutable result = new Int[][nullSpaceDims];
 		for (i in 0..nullSpaceDims-1) {
-			set result[i] = new Int[Length(matrix[0])];
-			for (j in 0..rank-1) {
-				set result[i][j] = reduced[j][i+rank];
+			if (i-nonPivotOffset >= Length(reduced) || reduced[i-nonPivotOffset][i] != 1) {
+				set nonPivotOffset = nonPivotOffset + 1;
 			}
-		}
 
-		for (i in 0..nullSpaceDims-1) {
-			set result[i][i+rank] = 1;
+			set result[i] = new Int[Length(matrix[0])];
+			mutable nonPivotResultOffset = 0;
+			for (j in 0..Length(matrix[0])-1) {
+				if (j-nonPivotResultOffset >= Length(reduced) || reduced[j-nonPivotResultOffset][j] != 1) {
+					set result[i][j] = 1;
+					set nonPivotResultOffset = nonPivotResultOffset + 1;
+				} else {
+					set result[i][j] = reduced[j-nonPivotResultOffset][i+nonPivotOffset];
+				}
+			}
 		}
 
 		return result;

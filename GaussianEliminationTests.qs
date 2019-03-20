@@ -42,6 +42,21 @@
 			[0, 0, 1]
 		], "");
     }
+	
+	operation TwoIdenticalRowsTest() : Unit
+    {		
+		let result = GaussianEliminationMod2([
+			[1, 1, 0],
+			[1, 1, 0],
+			[0, 0, 0]
+		]);
+
+		AssertIntMatrixEqual(result, [
+			[1, 1, 0],
+			[0, 0, 0],
+			[0, 0, 0]
+		], "");
+    }
 
 	operation OnlyFlipIf1Test () : Unit
     {
@@ -134,6 +149,36 @@
 			[0, 1, 1, 0]
 		], "");
     }
+
+	operation TwoIdenticalRowsKernelTest() : Unit
+    {		
+		let result = KernelMod2([
+			[1, 1, 0],
+			[1, 1, 0],
+			[0, 0, 0]
+		]);
+
+		AssertSubspaceEqual(result, [
+			[1, 1, 0],
+			[0, 0, 1]
+		], "");
+    }
+
+	operation NewKernelTest() : Unit {
+	
+		let result = KernelMod2([
+			[1,0,1,0,0],
+			[0,1,0,0,0],
+			[0,0,0,1,0],
+			[0,0,0,0,1]
+		]);
+
+		Message($"Result: {result}");
+
+		AssertSubspaceEqual(result, [
+			[1, 0, 1, 0, 0]
+		], "");
+	}
 
 	function AssertIntMatrixEqual(actual: Int[][], expected: Int[][], message: String) : Unit {
 		AssertIntEqual(Length(actual), Length(expected), message);
