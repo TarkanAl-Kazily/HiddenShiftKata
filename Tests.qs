@@ -219,8 +219,7 @@
         }
     }
 
-    operation GeneralizedHiddenShift_Test () : Unit {
-        let s = [0, 1, 0, 0];
+    operation GeneralizedHiddenShift_TestCase (s : Int[]) : Unit {
         let f = InnerProductOracle_Reference(_, _);
         let g = ShiftedOracle_Reference(f, s);
         let phasef = PhaseFlipOracle_Reference(f);
@@ -233,4 +232,11 @@
             }
         }
     }
+
+    operation GeneralizedHiddenShift_Test () : Unit {
+        for (N in 2 .. 2 .. 6) {
+            IterateThroughCartesianPower(N, 2, GeneralizedHiddenShift_TestCase);
+        }
+    }
+
 }

@@ -155,6 +155,7 @@ namespace HiddenShiftKata
             for (i in 0 .. Length(x) - 1) {
                 CNOT(x[i], target[i]);
             }
+            ApplyToEachCA(H, target);
         }
         controlled adjoint auto;
         controlled auto;
