@@ -22,32 +22,29 @@
 		let reduced = GaussianEliminationMod2(matrix);
 		let rank = QuickRank(reduced);
 		let nullSpaceDims = Length(matrix[0]) - rank;
-
-		// mutable nonPivotsFound = 0;
-		// mutable nonPivots = new Int[nullSpaceDims];
-		// for (i in 0..nullSpaceDims-1) {
-		// 	if (reduced[i][i-nonPivotsFound] == 1) {
-		// 		set nonPivots[nonPivotsFound] = i;
-		// 		set nonPivotsFound = nonPivotsFound + 1;
-		// 	}
-		// }
-
-		mutable nonPivotOffset = 0;
+		
+		mutable resultNumber = 0;
 		mutable result = new Int[][nullSpaceDims];
-		for (i in 0..nullSpaceDims-1) {
-			if (i-nonPivotOffset >= Length(reduced) || reduced[i-nonPivotOffset][i] != 1) {
-				set nonPivotOffset = nonPivotOffset + 1;
-			}
+		for (reducedCol in 0..Length(reduced[0])-1) {
+			// Find a column with a non-pivot row to take from
+			// If the element to check to see if this column is a pivot is off the end of the matrix,
+			// treat it as if it's a 0
+			if (reducedCol-resultNumber >= Length(reduced) || reduced[reducedCol-resultNumber][reducedCol] != 1) {
 
-			set result[i] = new Int[Length(matrix[0])];
-			mutable nonPivotResultOffset = 0;
-			for (j in 0..Length(matrix[0])-1) {
-				if (j-nonPivotResultOffset >= Length(reduced) || reduced[j-nonPivotResultOffset][j] != 1) {
-					set result[i][j] = 1;
-					set nonPivotResultOffset = nonPivotResultOffset + 1;
-				} else {
-					set result[i][j] = reduced[j-nonPivotResultOffset][i+nonPivotOffset];
+				set result[resultNumber] = new Int[Length(matrix[0])];
+
+				mutable skippedRows = 0;
+				for (resultDimension in 0..Length(matrix[0])-1) {
+					if (resultDimension+skippedRows >= Length(reduced) || reduced[resultDimension-skippedRows][resultDimension] != 1) {
+						 // Pull from identity matrix. Each of the skipped rows should be an element of the
+						 // identity matrix, instead of the reduced matrix
+						set result[resultNumber][resultDimension] = skippedRows == resultNumber ? 1 | 0;
+						set skippedRows = skippedRows + 1;
+					} else {
+						set result[resultNumber][resultDimension] = reduced[resultDimension+skippedRows][reducedCol]; // Pull from result matrix
+					}
 				}
+				set resultNumber = resultNumber + 1;
 			}
 		}
 

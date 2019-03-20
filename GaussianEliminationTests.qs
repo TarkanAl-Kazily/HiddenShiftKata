@@ -164,7 +164,7 @@
 		], "");
     }
 
-	operation NewKernelTest() : Unit {
+	operation NonPivotInMiddleTest() : Unit {
 	
 		let result = KernelMod2([
 			[1,0,1,0,0],
@@ -173,17 +173,29 @@
 			[0,0,0,0,1]
 		]);
 
-		Message($"Result: {result}");
-
 		AssertSubspaceEqual(result, [
 			[1, 0, 1, 0, 0]
+		], "");
+	}
+	
+	operation MultipleNonPivotInMiddleTest() : Unit {
+	
+		let result = KernelMod2([
+			[1,0,1,0,0],
+			[0,1,0,0,0],
+			[0,0,0,0,1]
+		]);
+
+		AssertSubspaceEqual(result, [
+			[1, 0, 1, 0, 0],
+			[0, 0, 0, 1, 0]
 		], "");
 	}
 
 	function AssertIntMatrixEqual(actual: Int[][], expected: Int[][], message: String) : Unit {
 		AssertIntEqual(Length(actual), Length(expected), message);
 		for (i in 0..Length(actual)-1) {
-			AssertBoolEqual(IntVectorEqual(actual[i], expected[i]), true, message);
+			AssertBoolEqual(IntVectorEqual(actual[i], expected[i]), true, $"Expected: {expected} Actual: {actual}. {message}");
 		}
 	}
 
@@ -194,7 +206,7 @@
 			for (j in 0..Length(expectedBasis) - 1) {
 				set foundMatch = foundMatch || IntVectorEqual(actualBasis[i], expectedBasis[j]);
 			}
-			AssertBoolEqual(foundMatch, true, message);
+			AssertBoolEqual(foundMatch, true, $"Expected: {expectedBasis} Actual: {actualBasis}. {message}");
 		}
 	}
 
