@@ -21,6 +21,8 @@ namespace HiddenShiftKata
 
     // None of the tasks require measurement.
 
+    // NOTE: remember that addition on a Z_2 x Z_2 x ... is defined as a bitwise XOR.
+
     //////////////////////////////////////////////////////////////////
     // Part I. Bent Boolean Oracles
     //////////////////////////////////////////////////////////////////
@@ -114,7 +116,7 @@ namespace HiddenShiftKata
 
     // Task 2.2. Implementing the deterministic quantum algorithm for the Hidden Shift Problem
     // Inputs:
-    //      1) the number of qubits in the input register N for the functions f, fd, and g.
+    //      1) the number of qubits in the input register N for the functions f, fd, and g
     //      2) a quantum operation which implements the oracle |x⟩ -> (-1)^g(x)|x⟩, where
     //         x is N-qubit input register and g is a bent boolean function
     //         from N-bit strings into {0, 1}
@@ -152,4 +154,61 @@ namespace HiddenShiftKata
     //////////////////////////////////////////////////////////////////
     // Part III. Hidden Subgroup Based Solution to the Hidden Shift Problem
     //////////////////////////////////////////////////////////////////
+
+    // Task 3.1. Implementing the oracle for the hidden function in the Hidden Subgroup Problem solution to the Hidden Shift Problem
+    // Inputs:
+    //      1) a quantum operation which implements the oracle |x⟩ -> (-1)^f(x)|x⟩, where
+    //         x is N-qubit input register and f is a bent boolean function
+    //         from N-bit strings into {0, 1}
+    //      2) a quantum operation which implements the oracle |x⟩ -> (-1)^g(x)|x⟩, where
+    //         x is N-qubit input register and g is a bent boolean function
+    //         from N-bit strings into {0, 1}
+    //
+    // The function g is guaranteed to satisfy the following property:
+    // there exists some N-bit string s such that for all N-bit strings x we have
+    // g(x) = f(x+s)
+    //
+    // Output:
+    //      a quantum operation h on inputs (b : Qubit(), x : Qubit[N], target : Qubit[N]) which computes the following value:
+    //      let function k(x) = f(x) if b = 0 or g(x) if b = 1, then we map:
+    //      |b⟩|x⟩|0⟩ -> |b⟩|x⟩Sum{(-1)^k(x+y)|y⟩}, where the summation is an equal superposition of every y in Z_2^n
+    function HidingFunctionOracle (Uf : ((Qubit[]) => Unit : Adjoint, Controlled), Ug : ((Qubit[]) => Unit : Adjoint, Controlled)) :
+            ((Qubit, Qubit[], Qubit[]) => Unit : Adjoint, Controlled) {
+
+        // Hint: remember that addition is an order 2 operation--the same circuit operation maps y -> x + y and x + y -> y
+        
+        // ...
+
+        return NoOp<(Qubit, Qubit[], Qubit[])>;
+    }
+
+    // Task 3.2. Implementing an iteration of the Hidden Subgroup Problem solution to the Hidden Shift Problem
+    // Inputs:
+    //      1) the number of qubits in the input register N for the functions f and g
+    //      2) a quantum operation which implements the oracle |x⟩ -> (-1)^f(x)|x⟩, where
+    //         x is N-qubit input register and f is a bent boolean function
+    //         from N-bit strings into {0, 1}
+    //      3) a quantum operation which implements the oracle |x⟩ -> (-1)^g(x)|x⟩, where
+    //         x is N-qubit input register and g is a bent boolean function
+    //         from N-bit strings into {0, 1}
+    //
+    // The function g is guaranteed to satisfy the following property:
+    // there exists some N-bit string s such that for all N-bit strings x we have
+    // g(x) = f(x+s)
+    //
+    // Output:
+    //      an integer array of length N + 1 with entries in Z_2 that is orthogonal to (1, s) in Z_2^(N+1), i.e. its dot product
+    //      with (1, s) is 0
+    operation HiddenShiftIteration(N: Int, Uf : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
+		mutable result = new Int[N+1];
+
+        // Perform the general algorithm for a Hidden Subgroup Problem with hidden function h.
+        // Simply create a equal superposition of all inputs to your hidden function, apply the oracle
+        // for h, uncompute the superposition, then measure the input bits. Remember that the oracle
+        // expects the target register in the |0⟩ in every input state.
+
+        // ...
+
+        return result;
+	}
 }
