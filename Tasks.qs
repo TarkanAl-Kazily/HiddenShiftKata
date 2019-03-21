@@ -28,9 +28,8 @@ namespace HiddenShiftKata
     //////////////////////////////////////////////////////////////////
 
     // Task 1.1: Inner Product Oracle f(x) = \sum_{x in 1..2..i-1} x_{i} x_{i+1}
-    // The binary inner product is the most natural kind of bent function,
-    // and has the property where the dual of the inner product oracle is
-    // itself.
+    // The binary inner product is the most natural kind of bent function, and
+    // has the property where the dual of the inner product oracle is itself.
     // Inputs:
     //      1) N qubits in arbitrary state |x> (input register) (N is even)
     //      2) a qubit in arbitrary state |target> (output qubit)
@@ -69,7 +68,8 @@ namespace HiddenShiftKata
     // where g(x) = f(x + s).
     //
     // This task is used as a setup to the Hidden Shift Problem, but is not part of
-    // the quantum algorithm solution.
+    // the quantum algorithm solution. With it, you should be able to implement
+    // your own tests of your Hidden Shift Problem solutions.
     //
     // Inputs:
     //      1) a marking oracle f
@@ -182,7 +182,7 @@ namespace HiddenShiftKata
         return NoOp<(Qubit, Qubit[], Qubit[])>;
     }
 
-    // Task 3.2. Implementing an iteration of the Hidden Subgroup Problem solution to the Hidden Shift Problem
+    // Task 3.2. Implementing a single iteration of the Hidden Subgroup Problem solution to the Hidden Shift Problem
     // Inputs:
     //      1) the number of qubits in the input register N for the functions f and g
     //      2) a quantum operation which implements the oracle |x⟩ -> (-1)^f(x)|x⟩, where
@@ -197,8 +197,12 @@ namespace HiddenShiftKata
     // g(x) = f(x+s)
     //
     // Output:
-    //      an integer array of length N + 1 with entries in Z_2 that is orthogonal to (1, s) in Z_2^(N+1), i.e. its dot product
-    //      with (1, s) is 0
+    //      an integer array of length N + 1 with entries in Z_2 that is orthogonal to (1, s)
+    //      in Z_2^(N+1), i.e. its dot product with (1, s) is 0
+    //
+    // Note that the whole algorithm will reconstruct the bit string s itself, but the quantum part of the
+    // algorithm will only find some vector orthogonal to the bit string s. The classical post-processing
+    // part is already implemented, so once you implement the quantum part, the tests will pass.
     operation HiddenShiftIteration(N: Int, Uf : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
 		mutable result = new Int[N+1];
 
@@ -208,6 +212,8 @@ namespace HiddenShiftKata
         // expects the target register in the |0⟩ in every input state.
 
         // ...
+
+        // Hint: see the Simon's Algorithm Kata
 
         return result;
 	}
