@@ -203,7 +203,7 @@ namespace HiddenShiftKata
     // Note that the whole algorithm will reconstruct the bit string s itself, but the quantum part of the
     // algorithm will only find some vector orthogonal to the bit string s. The classical post-processing
     // part is already implemented, so once you implement the quantum part, the tests will pass.
-    operation HiddenShiftIteration(N: Int, Uf : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
+    operation HiddenShiftIteration(N: Int, Uf : ((Qubit[]) => Unit : Adjoint, Controlled), Ug : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
 		mutable result = new Int[N+1];
 
         // Perform the general algorithm for a Hidden Subgroup Problem with hidden function h.
