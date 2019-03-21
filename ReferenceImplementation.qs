@@ -57,7 +57,7 @@ namespace HiddenShiftKata
 
     //--------------------------------------------------------------------
 
-    operation ShiftedOracle_Helper_Reference(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), s : Int[], x : Qubit[], target : Qubit) : Unit {
+    operation ShiftedOracle_Helper_Reference(Uf : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), s : Int[], x : Qubit[], target : Qubit) : Unit {
         body (...) {
             let N = Length(x);
             using (qs = Qubit[N]) {
@@ -69,7 +69,7 @@ namespace HiddenShiftKata
                 for (i in 0 .. N - 1) {
                     CNOT(x[i], qs[i]);
                 }
-                f(qs, target);
+                Uf(qs, target);
                 for (i in 0 .. N - 1) {
                     CNOT(x[i], qs[i]);
                 }
@@ -86,17 +86,17 @@ namespace HiddenShiftKata
     }
 
     // Returns the shifted oracle g for a marking oracle f such that g(x) = f(x + s).
-    function ShiftedOracle_Reference(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), s : Int[]) : ((Qubit[], Qubit) => Unit : Adjoint, Controlled) {
-        return ShiftedOracle_Helper_Reference(f, s, _, _);
+    function ShiftedOracle_Reference(Uf : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), s : Int[]) : ((Qubit[], Qubit) => Unit : Adjoint, Controlled) {
+        return ShiftedOracle_Helper_Reference(Uf, s, _, _);
     }
 
-    operation PhaseFlipOracle_Helper_Reference(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), x : Qubit[]) : Unit {
+    operation PhaseFlipOracle_Helper_Reference(Uf : ((Qubit[], Qubit) => Unit : Adjoint, Controlled), x : Qubit[]) : Unit {
         body (...) {
             let N = Length(x);
             using (b = Qubit()) {
                 X(b);
                 H(b);
-                f(x, b);
+                Uf(x, b);
                 H(b);
                 X(b);
             }
@@ -107,8 +107,8 @@ namespace HiddenShiftKata
     }
 
     // Returns the phase flip oracle corresponding to the marking oracle f.
-    function PhaseFlipOracle_Reference(f : ((Qubit[], Qubit) => Unit : Adjoint, Controlled)) : ((Qubit[]) => Unit : Adjoint, Controlled) {
-        return PhaseFlipOracle_Helper_Reference(f, _);
+    function PhaseFlipOracle_Reference(Uf : ((Qubit[], Qubit) => Unit : Adjoint, Controlled)) : ((Qubit[]) => Unit : Adjoint, Controlled) {
+        return PhaseFlipOracle_Helper_Reference(Uf, _);
     }
 
     //--------------------------------------------------------------------
@@ -139,7 +139,7 @@ namespace HiddenShiftKata
 
     //--------------------------------------------------------------------
 
-    operation HidingFunctionOracle_Helper_Reference (f : ((Qubit[]) => Unit : Adjoint, Controlled), g : ((Qubit[]) => Unit : Adjoint, Controlled),
+    operation HidingFunctionOracle_Helper_Reference (Uf : ((Qubit[]) => Unit : Adjoint, Controlled), Ug : ((Qubit[]) => Unit : Adjoint, Controlled),
                                                      b : Qubit, x : Qubit[], target : Qubit[]) : Unit {
         body (...) {
             ApplyToEachCA(H, target);
@@ -147,9 +147,9 @@ namespace HiddenShiftKata
                 CNOT(x[i], target[i]);
             }
 
-            Controlled g([b], (target));
+            Controlled Ug([b], (target));
             X(b);
-            Controlled f([b], (target));
+            Controlled Uf([b], (target));
             X(b);
 
             for (i in 0 .. Length(x) - 1) {
@@ -162,18 +162,18 @@ namespace HiddenShiftKata
         adjoint auto;
     }
 
-    function HidingFunctionOracle_Reference (f : ((Qubit[]) => Unit : Adjoint, Controlled), g : ((Qubit[]) => Unit : Adjoint, Controlled)) :
+    function HidingFunctionOracle_Reference (Uf : ((Qubit[]) => Unit : Adjoint, Controlled), Ug : ((Qubit[]) => Unit : Adjoint, Controlled)) :
             ((Qubit, Qubit[], Qubit[]) => Unit : Adjoint, Controlled) {
-        return HidingFunctionOracle_Helper_Reference(f, g, _, _, _);
+        return HidingFunctionOracle_Helper_Reference(Uf, Ug, _, _, _);
     }
 
-	operation HiddenShiftIteration_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
+	operation HiddenShiftIteration_Reference(n: Int, Uf : ((Qubit[]) => Unit : Adjoint, Controlled), Ug : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
 		mutable result = new Int[n+1];
 
         using ((cosetReg, targetReg) = (Qubit[n+1], Qubit[n])) {
 			ApplyToEach(H, cosetReg);
 
-			let h = HidingFunctionOracle_Reference(oraclef, oracleg);
+			let h = HidingFunctionOracle_Reference(Uf, Ug);
 			h(cosetReg[0], cosetReg[1..Length(cosetReg)-1], targetReg);
 
 			ApplyToEach(H, cosetReg);
@@ -188,13 +188,13 @@ namespace HiddenShiftKata
         return result;
 	}
 
-	operation GeneralizedHiddenShift_Reference(n: Int, oraclef : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
+	operation GeneralizedHiddenShift_Reference(n: Int, Uf : ((Qubit[]) => Unit : Adjoint, Controlled), Ug : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
 		mutable results = new Int[][n+1];
         for (i in 0 .. Length(results) - 1) {
             set results[i] = new Int[n+1];
         }
 		repeat {
-			let newResult = HiddenShiftIteration_Reference(n, oraclef, oracleg);
+			let newResult = HiddenShiftIteration_Reference(n, Uf, Ug);
 
 			let currentRank = RankMod2(results);
 			set results[currentRank] = newResult;

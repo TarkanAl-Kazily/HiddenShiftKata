@@ -209,13 +209,13 @@
     }
 
     // Implements the full Hidden Subgroup Based Hidden Shift Algorithm to produce s.
-	operation GeneralizedHiddenShift(n: Int, oraclef : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
+	operation GeneralizedHiddenShift(n: Int, Uf : ((Qubit[]) => Unit : Adjoint, Controlled), Ug : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
 		mutable results = new Int[][n+1];
         for (i in 0 .. Length(results) - 1) {
             set results[i] = new Int[n+1];
         }
 		repeat {
-			let newResult = HiddenShiftIteration(n, oraclef, oracleg);
+			let newResult = HiddenShiftIteration(n, Uf, Ug);
 
 			let currentRank = RankMod2(results);
 			set results[currentRank] = newResult;
