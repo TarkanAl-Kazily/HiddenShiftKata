@@ -4,52 +4,6 @@
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Extensions.Testing;
 
-    // ------------------------------------------------------
-    operation PrepareQubitRegister (qs : Qubit[], arr : Int[]) : Unit {
-        body (...) {
-            let N = Length(qs);
-            for (i in 0 .. N - 1) {
-                if (arr[i] == 1) {
-                    X(qs[i]);
-                }
-            }
-        }
-        adjoint auto;
-    }
-    
-    // These operations are taken from the DeutschJozsaAlgorithm Kata.
-    operation ApplyOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
-        
-        body (...) {
-            let N = Length(qs);
-            oracle(qs[0 .. N - 2], qs[N - 1]);
-        }
-        
-        adjoint invert;
-    }
-    
-    operation ApplyOracleWithOutputArrA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint), outputSize : Int) : Unit {
-        
-        body (...) {
-            let N = Length(qs);
-            oracle(qs[0 .. (N - 1) - outputSize], qs[N - outputSize .. N - 1]);
-        }
-        
-        adjoint invert;
-    }
-    
-    operation AssertTwoOraclesAreEqual (
-        nQubits : Range, 
-        oracle1 : ((Qubit[], Qubit) => Unit : Adjoint), 
-        oracle2 : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
-        let sol = ApplyOracleA(_, oracle1);
-        let refSol = ApplyOracleA(_, oracle2);
-        
-        for (i in nQubits) {
-            AssertOperationsEqualReferenced(sol, refSol, i + 1);
-        }
-    }
-    
     //--------------------------------------------------------------------
 
     // We test the InnerProductOracle by testing it on all possible input
@@ -180,6 +134,7 @@
 
     operation DeterministicHiddenShiftSolution_TestCase (s : Int[]) : Unit {
         let N = Length(s);
+        // The choices of f and g are arbitrary for testing purposes.
         let f = InnerProductOracle_Reference(_, _);
         let g = ShiftedOracle_Reference(f, s);
         let phasef = PhaseFlipOracle_Reference(f);
@@ -200,19 +155,25 @@
 
     //--------------------------------------------------------------------
 
-    operation HidingFunctionOracle_Test () : Unit {
+    operation HidingFunctionOracle_TestCase (s : Int[]) : Unit {
         using (b = Qubit()) {
             // The choices of f and g are arbitrary for testing purposes.
-            let s = [0, 1, 0, 0];
             let f = InnerProductOracle_Reference(_, _);
             let g = ShiftedOracle_Reference(f, s);
-            let h = HidingFunctionOracle_Reference(PhaseFlipOracle_Reference(f), PhaseFlipOracle_Reference(g));
+            let hUser = HidingFunctionOracle(PhaseFlipOracle_Reference(f), PhaseFlipOracle_Reference(g));
+			let hRef = HidingFunctionOracle_Reference(PhaseFlipOracle_Reference(f), PhaseFlipOracle_Reference(g));
             let nqubits = Length(s);
 
-            //AssertTwoOraclesAreEqual(nqubits .. nqubits, f, h(b, _, _));
+            AssertTwoHidingOraclesAreEqual(nqubits .. nqubits, hUser(b, _, _), hRef(b, _, _));
             X(b);
-            //AssertTwoOraclesAreEqual(nqubits .. nqubits, g, h(b, _, _));
+            AssertTwoHidingOraclesAreEqual(nqubits .. nqubits, hUser(b, _, _), hRef(b, _, _));
             X(b);
+        }
+    }
+
+    operation HidingFunctionOracle_Test () : Unit {
+        for (N in 2 .. 2 .. 4) {
+            IterateThroughCartesianPower(N, 2, HidingFunctionOracle_TestCase);
         }
     }
 
@@ -279,6 +240,75 @@
         }
         for (N in 2 .. 2 .. 4) {
             IterateThroughCartesianPower(N, 2, GeneralizedHiddenShift_TestCase);
+        }
+    }
+	
+	// Utilities
+    // ------------------------------------------------------
+    operation PrepareQubitRegister (qs : Qubit[], arr : Int[]) : Unit {
+        body (...) {
+            let N = Length(qs);
+            for (i in 0 .. N - 1) {
+                if (arr[i] == 1) {
+                    X(qs[i]);
+                }
+            }
+        }
+        adjoint auto;
+    }
+
+    operation ApplyHidingOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint)) : Unit {
+        
+        body (...) {
+            let N = Length(qs)/2;
+            oracle(qs[0 .. N-1], qs[N..2*N-1]);
+        }
+        
+        adjoint invert;
+    }
+
+    operation AssertTwoHidingOraclesAreEqual (
+        nQubits : Range, 
+        oracle1 : ((Qubit[], Qubit[]) => Unit : Adjoint), 
+        oracle2 : ((Qubit[], Qubit[]) => Unit : Adjoint)) : Unit {
+        let sol = ApplyHidingOracleA(_, oracle1);
+        let refSol = ApplyHidingOracleA(_, oracle2);
+        
+        for (i in nQubits) {
+            AssertOperationsEqualReferenced(sol, refSol, 2 * i);
+        }
+    }
+
+    // These operations are taken from the DeutschJozsaAlgorithm Kata.   
+    operation ApplyOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
+        
+        body (...) {
+            let N = Length(qs);
+            oracle(qs[0 .. N - 2], qs[N - 1]);
+        }
+        
+        adjoint invert;
+    }
+
+    operation ApplyOracleWithOutputArrA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint), outputSize : Int) : Unit {
+        
+        body (...) {
+            let N = Length(qs);
+            oracle(qs[0 .. (N - 1) - outputSize], qs[N - outputSize .. N - 1]);
+        }
+        
+        adjoint invert;
+    }
+    
+    operation AssertTwoOraclesAreEqual (
+        nQubits : Range, 
+        oracle1 : ((Qubit[], Qubit) => Unit : Adjoint), 
+        oracle2 : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
+        let sol = ApplyOracleA(_, oracle1);
+        let refSol = ApplyOracleA(_, oracle2);
+        
+        for (i in nQubits) {
+            AssertOperationsEqualReferenced(sol, refSol, i + 1);
         }
     }
 
