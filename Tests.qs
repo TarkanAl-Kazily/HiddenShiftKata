@@ -179,11 +179,13 @@
 
     operation HiddenShiftIteration_TestCase (s : Int[]) : Unit {
         let N = Length(s);
+        // The choices of f and g are arbitrary for testing purposes.
         let f = InnerProductOracle_Reference(_, _);
         let g = ShiftedOracle_Reference(f, s);
         let phasef = PhaseFlipOracle_Reference(f);
         let phaseg = PhaseFlipOracle_Reference(g);
 
+        // Verify that HiddenShiftIteration does not return all zeros by trying up to 4 attempts.
         mutable res = new Int[N];
         let num_iterations = 4;
         mutable iterations = num_iterations;
@@ -192,9 +194,11 @@
             set iterations = iterations - 1;
 		} until ((iterations == 0) || (QuickRank([res]) == 1))
 		fixup {}
+
         if (QuickRank([res]) == 0) {
             fail $"HiddenShiftIteration did not produce a non-zero result in {num_iterations} iterations";
         }
+
         mutable sum = res[0];
         for (i in 1 .. N) {
             set sum = sum + s[i - 1] * res[i];
@@ -204,6 +208,7 @@
         }
     }
 
+    // Implements the full Hidden Subgroup Based Hidden Shift Algorithm to produce s.
 	operation GeneralizedHiddenShift(n: Int, oraclef : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
 		mutable results = new Int[][n+1];
         for (i in 0 .. Length(results) - 1) {
