@@ -19,7 +19,7 @@ namespace HiddenShiftKata
     // which initially fails. Your goal is to fill in the blank (marked with // ... comment)
     // with some Q# code to make the failing test pass.
 
-    // None of the tasks require measurement.
+    // None of the tasks in Part I require measurement.
 
     // NOTE: remember that addition on a Z_2 x Z_2 x ... is defined as a bitwise XOR.
 
@@ -27,7 +27,7 @@ namespace HiddenShiftKata
     // Part I. Bent Boolean Oracles
     //////////////////////////////////////////////////////////////////
 
-    // Task 1.1: Inner Product Oracle f(x) = \sum x_{i} x_{i+1}
+    // Task 1.1: Inner Product Oracle f(x) = \sum_{x in 1..2..i-1} x_{i} x_{i+1}
     // The binary inner product is the most natural kind of bent function,
     // and has the property where the dual of the inner product oracle is
     // itself.
