@@ -26,6 +26,16 @@
         
         adjoint invert;
     }
+
+    operation ApplyHidingOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint)) : Unit {
+        
+        body (...) {
+            let N = Length(qs)/2;
+            oracle(qs[0 .. N-1], qs[N..2*N-1]);
+        }
+        
+        adjoint invert;
+    }
     
     
     operation ApplyOracleWithOutputArrA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint), outputSize : Int) : Unit {
@@ -45,6 +55,18 @@
         oracle2 : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
         let sol = ApplyOracleA(_, oracle1);
         let refSol = ApplyOracleA(_, oracle2);
+        
+        for (i in nQubits) {
+            AssertOperationsEqualReferenced(sol, refSol, i + 1);
+        }
+    }
+	
+    operation AssertTwoHidingOraclesAreEqual (
+        nQubits : Range, 
+        oracle1 : ((Qubit[], Qubit[]) => Unit : Adjoint), 
+        oracle2 : ((Qubit[], Qubit[]) => Unit : Adjoint)) : Unit {
+        let sol = ApplyHidingOracleA(_, oracle1);
+        let refSol = ApplyHidingOracleA(_, oracle2);
         
         for (i in nQubits) {
             AssertOperationsEqualReferenced(sol, refSol, i + 1);
@@ -187,12 +209,13 @@
             let s = [0, 1, 0, 0];
             let f = InnerProductOracle_Reference(_, _);
             let g = ShiftedOracle_Reference(f, s);
-            let h = HidingFunctionOracle_Reference(PhaseFlipOracle_Reference(f), PhaseFlipOracle_Reference(g));
+            let hUser = HidingFunctionOracle(PhaseFlipOracle_Reference(f), PhaseFlipOracle_Reference(g));
+			let hRef = HidingFunctionOracle_Reference(PhaseFlipOracle_Reference(f), PhaseFlipOracle_Reference(g));
             let nqubits = Length(s);
 
-            //AssertTwoOraclesAreEqual(nqubits .. nqubits, f, h(b, _, _));
+            AssertTwoHidingOraclesAreEqual(nqubits .. nqubits, hUser(b, _, _), hRef(b, _, _));
             X(b);
-            //AssertTwoOraclesAreEqual(nqubits .. nqubits, g, h(b, _, _));
+            AssertTwoHidingOraclesAreEqual(nqubits .. nqubits, hUser(b, _, _), hRef(b, _, _));
             X(b);
         }
     }
