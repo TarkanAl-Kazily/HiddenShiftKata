@@ -208,7 +208,7 @@
         let num_iterations = 4;
         mutable iterations = num_iterations;
 		repeat {
-            set res = HiddenShiftIteration_Reference(N, phasef, phaseg);
+            set res = HiddenShiftIteration(N, phasef, phaseg);
             set iterations = iterations - 1;
 		} until ((iterations == 0) || (QuickRank([res]) == 1))
 		fixup {}
@@ -224,11 +224,21 @@
         }
     }
 
-    operation HiddenShiftIteration_Test () : Unit {
-        for (N in 2 .. 2 .. 4) {
-            IterateThroughCartesianPower(N, 2, HiddenShiftIteration_TestCase);
+	operation GeneralizedHiddenShift(n: Int, oraclef : ((Qubit[]) => Unit : Adjoint, Controlled), oracleg : ((Qubit[]) => Unit : Adjoint, Controlled)) : Int[] {
+		mutable results = new Int[][n+1];
+        for (i in 0 .. Length(results) - 1) {
+            set results[i] = new Int[n+1];
         }
-    }
+		repeat {
+			let newResult = HiddenShiftIteration(n, oraclef, oracleg);
+
+			let currentRank = RankMod2(results);
+			set results[currentRank] = newResult;
+		} until (Length(KernelMod2(results)) == 1)
+		fixup {}
+
+		return (KernelMod2(results))[0];
+	}
 
     operation GeneralizedHiddenShift_TestCase (s : Int[]) : Unit {
         let f = InnerProductOracle_Reference(_, _);
@@ -236,7 +246,7 @@
         let phasef = PhaseFlipOracle_Reference(f);
         let phaseg = PhaseFlipOracle_Reference(g);
 
-        let res = (GeneralizedHiddenShift_Reference(Length(s), phasef, phaseg))[1 .. Length(s)];
+        let res = (GeneralizedHiddenShift(Length(s), phasef, phaseg))[1 .. Length(s)];
         for (i in 0 .. Length(s) - 1) {
             if (not (s[i] == res[i])) {
                 fail $"Got {res}. Expected {s}";
@@ -244,8 +254,11 @@
         }
     }
 
-    operation GeneralizedHiddenShift_Test () : Unit {
-        for (N in 2 .. 2 .. 6) {
+    operation HiddenShiftIteration_Test () : Unit {
+        for (N in 2 .. 2 .. 4) {
+            IterateThroughCartesianPower(N, 2, HiddenShiftIteration_TestCase);
+        }
+        for (N in 2 .. 2 .. 4) {
             IterateThroughCartesianPower(N, 2, GeneralizedHiddenShift_TestCase);
         }
     }
