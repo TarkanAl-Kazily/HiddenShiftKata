@@ -161,11 +161,11 @@
 
     operation DeterministicHiddenShiftSolution_TestCase (s : Int[]) : Unit {
         let N = Length(s);
-        let f = InnerProductOracle(_, _);
-        let g = ShiftedOracle(f, s);
-        let phasef = PhaseFlipOracle(f);
-        let phaseg = PhaseFlipOracle(g);
-        let res = DeterministicHiddenShiftSolution_Reference(N, phasef, phaseg);
+        let f = InnerProductOracle_Reference(_, _);
+        let g = ShiftedOracle_Reference(f, s);
+        let phasef = PhaseFlipOracle_Reference(f);
+        let phaseg = PhaseFlipOracle_Reference(g);
+        let res = DeterministicHiddenShiftSolution(N, phaseg, phasef);
         for (j in 0 .. N-1) {
             if (not (res[j] == s[j])) {
                 fail $"Got {res}. Expected {s}";
