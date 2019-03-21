@@ -199,11 +199,22 @@
 
     operation HiddenShiftIteration_TestCase (s : Int[]) : Unit {
         let N = Length(s);
-        let f = InnerProductOracle(_, _);
-        let g = ShiftedOracle(f, s);
-        let phasef = PhaseFlipOracle(f);
-        let phaseg = PhaseFlipOracle(g);
-        let res = HiddenShiftIteration_Reference(N, phasef, phaseg);
+        let f = InnerProductOracle_Reference(_, _);
+        let g = ShiftedOracle_Reference(f, s);
+        let phasef = PhaseFlipOracle_Reference(f);
+        let phaseg = PhaseFlipOracle_Reference(g);
+
+        mutable res = new Int[N];
+        let num_iterations = 4;
+        mutable iterations = num_iterations;
+		repeat {
+            set res = HiddenShiftIteration_Reference(N, phasef, phaseg);
+            set iterations = iterations - 1;
+		} until ((iterations == 0) || (QuickRank([res]) == 1))
+		fixup {}
+        if (QuickRank([res]) == 0) {
+            fail $"HiddenShiftIteration did not produce a non-zero result in {num_iterations} iterations";
+        }
         mutable sum = res[0];
         for (i in 1 .. N) {
             set sum = sum + s[i - 1] * res[i];
