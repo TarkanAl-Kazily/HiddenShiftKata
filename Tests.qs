@@ -17,6 +17,7 @@
         adjoint auto;
     }
     
+    // These operations are taken from the DeutschJozsaAlgorithm Kata.
     operation ApplyOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
         
         body (...) {
@@ -27,7 +28,6 @@
         adjoint invert;
     }
     
-    
     operation ApplyOracleWithOutputArrA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint), outputSize : Int) : Unit {
         
         body (...) {
@@ -37,7 +37,6 @@
         
         adjoint invert;
     }
-    
     
     operation AssertTwoOraclesAreEqual (
         nQubits : Range, 
@@ -51,9 +50,10 @@
         }
     }
     
-
     //--------------------------------------------------------------------
 
+    // We test the InnerProductOracle by testing it on all possible input
+    // states and comparing the results with a classical implementation.
     function InnerProductClassical (arr : Int[]) : Int {
         mutable res = 0;
         for (i in 0 .. 2 .. Length(arr) - 1) {
@@ -87,6 +87,9 @@
 
     //--------------------------------------------------------------------
 
+    // We test the QuadraticOracle by testing it with specific inputs Q and L,
+    // on all possible input states and comparing the results with a classical
+    // implementation.
     function QuadraticClassical (arr : Int[], Q : Int[][], L : Int[]) : Int {
         let N = Length(arr);
         mutable res = 0;
@@ -116,12 +119,28 @@
     }
 
     operation QuadraticOracle_Test () : Unit {
-        mutable Q = new Int[][4];
+        mutable Q = new Int[][2];
+        set Q[0] = [0, 1];
+        set Q[1] = [0, 0];
+        mutable L = [1, 1];
+        IterateThroughCartesianPower(Length(L), 2, QuadraticOracle_TestCase(_, Q, L));
+
+        set Q = new Int[][4];
         set Q[0] = [0, 1, 1, 1];
         set Q[1] = [0, 0, 1, 1];
         set Q[2] = [0, 0, 0, 1];
         set Q[3] = [0, 0, 0, 0];
-        let L = [1, 0, 0, 0];
+        set L = [1, 0, 0, 0];
+        IterateThroughCartesianPower(Length(L), 2, QuadraticOracle_TestCase(_, Q, L));
+
+        set Q = new Int[][6];
+        set Q[0] = [0, 1, 1, 1, 1, 1];
+        set Q[1] = [0, 0, 1, 1, 1, 1];
+        set Q[2] = [0, 0, 0, 1, 1, 1];
+        set Q[3] = [0, 0, 0, 0, 1, 1];
+        set Q[4] = [0, 0, 0, 0, 0, 1];
+        set Q[5] = [0, 0, 0, 0, 0, 0];
+        set L = [0, 1, 0, 1, 0, 1];
         IterateThroughCartesianPower(Length(L), 2, QuadraticOracle_TestCase(_, Q, L));
     }
 
