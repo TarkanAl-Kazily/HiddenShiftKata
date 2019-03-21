@@ -4,76 +4,6 @@
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Extensions.Testing;
 
-    // ------------------------------------------------------
-    operation PrepareQubitRegister (qs : Qubit[], arr : Int[]) : Unit {
-        body (...) {
-            let N = Length(qs);
-            for (i in 0 .. N - 1) {
-                if (arr[i] == 1) {
-                    X(qs[i]);
-                }
-            }
-        }
-        adjoint auto;
-    }
-    
-    operation ApplyOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
-        
-        body (...) {
-            let N = Length(qs);
-            oracle(qs[0 .. N - 2], qs[N - 1]);
-        }
-        
-        adjoint invert;
-    }
-
-    operation ApplyHidingOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint)) : Unit {
-        
-        body (...) {
-            let N = Length(qs)/2;
-            oracle(qs[0 .. N-1], qs[N..2*N-1]);
-        }
-        
-        adjoint invert;
-    }
-    
-    
-    operation ApplyOracleWithOutputArrA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint), outputSize : Int) : Unit {
-        
-        body (...) {
-            let N = Length(qs);
-            oracle(qs[0 .. (N - 1) - outputSize], qs[N - outputSize .. N - 1]);
-        }
-        
-        adjoint invert;
-    }
-    
-    
-    operation AssertTwoOraclesAreEqual (
-        nQubits : Range, 
-        oracle1 : ((Qubit[], Qubit) => Unit : Adjoint), 
-        oracle2 : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
-        let sol = ApplyOracleA(_, oracle1);
-        let refSol = ApplyOracleA(_, oracle2);
-        
-        for (i in nQubits) {
-            AssertOperationsEqualReferenced(sol, refSol, i + 1);
-        }
-    }
-	
-    operation AssertTwoHidingOraclesAreEqual (
-        nQubits : Range, 
-        oracle1 : ((Qubit[], Qubit[]) => Unit : Adjoint), 
-        oracle2 : ((Qubit[], Qubit[]) => Unit : Adjoint)) : Unit {
-        let sol = ApplyHidingOracleA(_, oracle1);
-        let refSol = ApplyHidingOracleA(_, oracle2);
-        
-        for (i in nQubits) {
-            AssertOperationsEqualReferenced(sol, refSol, i + 1);
-        }
-    }
-    
-
     //--------------------------------------------------------------------
 
     function InnerProductClassical (arr : Int[]) : Int {
@@ -285,5 +215,77 @@
             IterateThroughCartesianPower(N, 2, GeneralizedHiddenShift_TestCase);
         }
     }
+	
+	// Utilities
+    // ------------------------------------------------------
+    operation PrepareQubitRegister (qs : Qubit[], arr : Int[]) : Unit {
+        body (...) {
+            let N = Length(qs);
+            for (i in 0 .. N - 1) {
+                if (arr[i] == 1) {
+                    X(qs[i]);
+                }
+            }
+        }
+        adjoint auto;
+    }
+    
+    operation ApplyOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
+        
+        body (...) {
+            let N = Length(qs);
+            oracle(qs[0 .. N - 2], qs[N - 1]);
+        }
+        
+        adjoint invert;
+    }
+
+    operation ApplyHidingOracleA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint)) : Unit {
+        
+        body (...) {
+            let N = Length(qs)/2;
+            oracle(qs[0 .. N-1], qs[N..2*N-1]);
+        }
+        
+        adjoint invert;
+    }
+    
+    
+    operation ApplyOracleWithOutputArrA (qs : Qubit[], oracle : ((Qubit[], Qubit[]) => Unit : Adjoint), outputSize : Int) : Unit {
+        
+        body (...) {
+            let N = Length(qs);
+            oracle(qs[0 .. (N - 1) - outputSize], qs[N - outputSize .. N - 1]);
+        }
+        
+        adjoint invert;
+    }
+    
+    
+    operation AssertTwoOraclesAreEqual (
+        nQubits : Range, 
+        oracle1 : ((Qubit[], Qubit) => Unit : Adjoint), 
+        oracle2 : ((Qubit[], Qubit) => Unit : Adjoint)) : Unit {
+        let sol = ApplyOracleA(_, oracle1);
+        let refSol = ApplyOracleA(_, oracle2);
+        
+        for (i in nQubits) {
+            AssertOperationsEqualReferenced(sol, refSol, i + 1);
+        }
+    }
+	
+    operation AssertTwoHidingOraclesAreEqual (
+        nQubits : Range, 
+        oracle1 : ((Qubit[], Qubit[]) => Unit : Adjoint), 
+        oracle2 : ((Qubit[], Qubit[]) => Unit : Adjoint)) : Unit {
+        let sol = ApplyHidingOracleA(_, oracle1);
+        let refSol = ApplyHidingOracleA(_, oracle2);
+        
+        for (i in nQubits) {
+            AssertOperationsEqualReferenced(sol, refSol, i + 1);
+        }
+    }
+    
+
 
 }
