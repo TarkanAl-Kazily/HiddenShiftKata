@@ -14,5 +14,8 @@ generalized Hidden Shift Problem Algorithm is already implemented for you. Howev
 unlike the Simon's Algorithm Kata, we have included a Gaussian Elimination library in Q#.
 
 #### Hidden Shift Problem
-* A good place to start is [our research paper](https://en.wikipedia.org/wiki/Simon%27s_problem).
-* [Lecture 6: Simon’s algorithm](https://cs.uwaterloo.ca/~watrous/CPSC519/LectureNotes/06.pdf) has a somewhat clearer description of the measurement part of the quantum circuit.
+* We recommend completing the [Simon's Algorithm Kata](https://github.com/Microsoft/QuantumKatas/tree/master/SimonsAlgorithm)
+before starting on this Kata.
+* We recommend reading [our paper](Hidden_Shift_Problem.pdf), which goes over all the theory
+and background needed for completing the Hidden Shift Problem Kata.
+* For more details on the Hidden Shift Problem, read [Quantum algorithms for highly non-linear Boolean functions](https://arxiv.org/abs/0811.3208) by Martin Roetteler, on which our paper is based on.
